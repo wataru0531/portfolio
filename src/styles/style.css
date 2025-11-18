@@ -1,0 +1,550 @@
+
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+}
+
+
+:root {
+	font-size: 18px;
+	--color-text: #fff;
+	--color-text-alt: #767474;
+	--color-bg: #0b0a0a;
+	--color-link: #aaa;
+	--color-link-hover: #fff;
+
+	--color-black: #000000;
+	--color-wite: #ffffff;
+
+	--gradient-1: rbg(17, 168, 255);
+	--gradient-2: rgb(152, 17, 255);
+	--bg-color: rgb(255, 255, 255);
+	--main-text: #161616;
+	--secondary-text: #ffffff;
+}
+
+html {
+	scroll-behavior: initial;
+}
+
+html, body{
+	width: 100%;
+	min-height: 100%;
+}
+
+body {
+	min-height: 100vh;
+  font-family: "Inter", "游ゴシック体", YuGothic, "游ゴシック Medium",
+    "Yu Gothic Medium", "游ゴシック", "Yu Gothic", sans-serif;
+	font-optical-sizing: auto; /* 文字サイズに応じて、フォントの太さやディテールを微調整 */
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: normal; /* 0 */
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  overflow-wrap: break-word;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: -9999;
+
+  /* スクロールバー 非表示 */
+  scrollbar-width: none; /* Firefox */
+
+}
+
+/* webkit系 Chrome Safari Edge */
+/* すべての要素にあてる */
+::-webkit-scrollbar{
+  display: none;
+}
+
+.content-open {
+	overflow: hidden;
+	height: 100vh;
+}
+
+.oh {
+    position: relative;
+    overflow: hidden
+}
+
+.oh__inner {
+    will-change: transform;
+    display: inline-block;
+}
+
+.line {
+	transform-origin: 0;
+	white-space: nowrap;
+	will-change: transform;
+}
+
+/* Page Loader */
+.js .loading::before,
+.js .loading::after {
+	content: '';
+	position: fixed;
+	z-index: 1000;
+}
+
+.js .loading::before {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: var(--color-bg);
+}
+
+.js .loading::after {
+	top: 50%;
+	left: 50%;
+	width: 60px;
+	height: 60px;
+	margin: -30px 0 0 -30px;
+	border-radius: 50%;
+	opacity: 0.4;
+	background: var(--color-link);
+	animation: loaderAnim 0.7s linear infinite alternate forwards;
+
+}
+
+@keyframes loaderAnim {
+	to {
+		opacity: 1;
+		transform: scale3d(0.5,0.5,1);
+	}
+}
+
+a {
+	text-decoration: none;
+	color: var(--color-link);
+	outline: none;
+	cursor: pointer;
+}
+
+a:hover {
+	color: var(--color-link-hover);
+	outline: none;
+}
+
+/* Better focus styles from https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible */
+a:focus {
+	/* Provide a fallback style for browsers
+	 that don't support :focus-visible */
+	outline: none;
+	background: lightgrey;
+}
+
+a:focus:not(:focus-visible) {
+	/* Remove the focus indicator on mouse-focus for browsers
+	 that do support :focus-visible */
+	background: transparent;
+}
+
+a:focus-visible {
+	/* Draw a very noticeable focus style for
+	 keyboard-focus on browsers that do support
+	 :focus-visible */
+	outline: 2px solid red;
+	background: transparent;
+}
+
+.unbutton {
+	background: none;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	font: inherit;
+	fill: currentColor;
+	cursor: pointer;
+	color: inherit;
+	display: flex;
+	align-items: center;
+}
+
+.unbutton:focus {
+	outline: none;
+}
+
+.unbutton span:first-child {
+	margin-right: 1rem;
+}
+
+.unbutton span:last-child {
+	margin-left: 1rem;
+}
+
+main {
+	margin-top: 200px;
+	position: relative;
+	display: grid;
+	/* grid-template-areas: 'header' 'page'; */
+}
+
+.header {
+	grid-area: header;
+	padding: 1.5rem 2rem;
+	width: 100%;
+	
+	/* background: var(--color-bg); */
+	display: grid;
+	grid-template-columns: auto auto;
+	grid-template-rows: auto;
+	grid-template-areas: 'title' 'prev' 'sponsor';
+	grid-row-gap: 5vh;
+
+	align-content: space-between;
+	text-transform: uppercase;
+	mix-blend-mode: difference;
+
+	position: fixed;
+	top: 0;
+	/* z-index: 1000; */
+	z-index: -1;
+}
+
+.header__title {
+	grid-area: title;
+	display: flex;
+}
+
+.header__title-main {
+	font-size: 1rem;
+	margin: 0;
+	font-weight: normal;
+	line-height: 1;
+	align-self: center;
+	text-align: right;
+}
+
+.header__title-back {
+	position: relative;
+	display: flex;
+	align-items: flex-end;
+	margin-bottom: 0.15rem;
+}
+
+.header__title-back span {
+	display: none;
+}
+
+.header__title-back svg {
+	fill: currentColor;
+}
+
+.header__prev {
+	grid-area: prev;
+}
+
+.preview-wrap {
+	grid-area: page;
+	padding: 0 2rem 3rem;
+	position: relative;
+	z-index: 100;
+}
+
+/* section全体 */
+.content-open .preview-wrap {
+	pointer-events: none;
+}
+
+.preview {
+	min-height: 400px;
+	padding: 3rem 0 0;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: 100%;
+	grid-template-rows: 100%;
+	will-change: transform;
+}
+
+.preview__img-wrap {
+	display: block;
+	grid-area: 1 / 1 / -1 / -1;
+	cursor: pointer;
+}
+
+.preview__img {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	position: relative;
+}
+
+.preview__img-inner {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-size: 150%;
+	background-position: 0% 0%;
+	background-repeat: no-repeat;
+
+	transform-origin: 50% 0;
+}
+
+.content__meta {
+	margin-bottom: 2rem;
+	color: var(--color-text-alt);
+}
+
+.preview__title {
+	text-align: center;
+	align-self: center;
+	justify-self: center;
+	grid-area: 1 / 1 / -1 / -1;
+	position: relative;
+	transform: translate3d(0,50%,0);
+	pointer-events: none;
+}
+
+.preview__title-main {
+	line-height: 1.2;
+	margin: 0;
+	font-weight: normal;
+	font-size: clamp(2rem,10vw,8rem);
+	font-family: scotch-display, sans-serif;
+	font-weight: 300;
+}
+
+.preview__title-main > span {
+	display: block;
+}
+
+.preview__title-main > span:last-child {
+	display: block;
+	padding: 0 1rem;
+	transform: translateY(-33%);
+	font-family: scotch-display, sans-serif;
+	font-weight: 500;
+	font-style: italic;
+}
+
+.preview__desc {
+	margin: 0 auto;
+	max-width: 400px;
+	text-transform: uppercase;
+	line-height: 1.2;
+}
+
+.content-wrap {
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 0;
+	grid-area: page;
+	height: 100vh;
+	overflow: hidden;
+	display: grid;
+	grid-template-areas: 
+	'back back'
+	'content content';
+	grid-template-rows: auto 1fr;
+	pointer-events: none;
+	padding: 2rem;
+}
+
+.action {
+	visibility: hidden;
+	pointer-events: none;
+	opacity: 0;
+}
+
+/* 戻るボタン */
+.content-open .action {
+	visibility: visible;
+	pointer-events: auto;
+}
+
+.action svg {
+	width: 2em;
+	height: 2em;
+}
+
+.action--back {
+	justify-self: start;
+	grid-area: back;
+	padding: 1rem 0;
+}
+
+.action span {
+	text-transform: uppercase;
+}
+
+/* .content__outer{
+	grid-area: content;
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	height: 100%;
+	opacity: 0;
+} */
+
+.content {
+	grid-area: content;
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	height: 100%;
+	opacity: 0;
+
+	display: grid;
+	grid-row: 2 / span 2;
+	grid-gap: 2vw;
+	grid-template-columns: 100%;
+	grid-template-areas:
+	'img' 
+	'thumbs'
+	'text';
+	grid-template-rows: 20vh min-content auto;
+}
+
+
+/* コンテンツをクリックできる様に */
+.content-open .content{
+	position: relative;
+	pointer-events: auto;
+	opacity: 1;
+}
+
+/* 画像がクリックできなくする */
+.content-open .content__preview-wrapper{
+	pointer-events: none;
+}
+
+
+.content__group {
+	grid-area: text;
+}
+
+.content__title {
+	font-family: scotch-display, sans-serif;
+	font-weight: 400;
+	font-size: clamp(3rem,6.5vw,5.5rem);
+}
+
+.content__title span {
+	display: block;
+}
+
+.content__title > span:last-child {
+	transform: translateY(-25%);
+	font-family: scotch-display, sans-serif;
+	font-weight: 500;
+	font-style: italic;
+	padding: 0 0 0 0.75rem;
+}
+
+.content .preview__img {
+	grid-area: img;
+}
+
+/* 遷移先の画像はここにぶち込む */
+.content__preview-wrapper {
+	grid-area: img;
+
+	/* width: 100%;
+	height: 100%;
+	overflow: hidden;
+	position: relative; */
+}
+
+
+
+.content__thumbs {
+	/* grid-area: thumbs;
+	display: grid;
+	grid-auto-columns: auto;
+	grid-auto-flow: column;
+	grid-gap: 2vw;
+	justify-content: start; */
+}
+
+/*  */
+.content__thumbs-inner{
+	grid-area: thumbs;
+	display: grid;
+	grid-auto-columns: auto;
+	grid-auto-flow: column;
+	grid-gap: 2vw;
+	justify-content: start;
+}
+
+.content__thumbs-item {
+	width: 50px;
+	aspect-ratio: 1.5;
+}
+
+.content__thumbs-item:hover {
+	cursor: not-allowed;
+}
+
+.hidden {
+	opacity: 0;
+	pointer-events: none;
+}
+
+@media screen and (min-width: 53em) {
+	main {
+		grid-template-areas: 'header page';
+		grid-template-columns: auto 1fr;
+	}
+
+	.header {
+		/* position: -webkit-sticky; Safari */
+		/* position: sticky; */
+		width: auto;
+		top: 0;
+		height: 100vh;
+		/* opacity: 0.5; */
+		padding: 2rem;
+	}
+
+	.header__title, 
+	.header__prev,
+	#cdawrap {
+		justify-self: start;
+		-webkit-writing-mode: vertical-rl;
+		writing-mode: vertical-rl;
+		transform: rotate(180deg);
+	}
+
+	body #cdawrap {
+		justify-self: start;
+	}
+
+	.header__prev {
+		margin: 1rem 0 0;
+	}
+
+	.header__title-back {
+		transform: scale3d(1,-1,1);
+	}
+	.preview {
+		min-height: 90vh;
+	}
+	.preview__desc {
+		margin: -2.5rem auto 0;
+	}
+	.content {
+		grid-template-columns: 60% 1fr;
+		grid-template-areas:
+		'... ...' 
+		'img text'
+		'thumbs text'
+		'... ...';
+		grid-template-rows: 2rem 1fr auto 1rem;
+	}
+	.content__thumbs-item {
+		width: 100px;
+	}
+	.content__text {
+		max-width: 400px;
+	}
+}

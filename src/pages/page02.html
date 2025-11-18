@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>wc | page02</title>
+		<meta name="description" content="page02のdescription" />
+		<meta name="keywords" content="SEO,検索エンジン,チェックツール" /><!-- ３～５個程度のキーワードを記述するのが一般的。必要ないとも言われている。 -->
+		<meta name="author" content="Wataru Yasukawa" />
+		<meta name="theme-color" content="#000000"> <!-- モバイルブラウザのアドレスバーの色。PWA対応やデザインの一貫性に役立つ -->
+
+		<!-- OGP -->
+		<meta property="og:title" content="wc | page02">
+		<meta property="og:site_name" content="wc">
+		<meta property="og:description" content="page02のog:description">
+		<meta property="og:type" content="article">
+		
+		<meta property="og:url" content="このページのURL。絶対パス">
+		<meta property="og:image" content="1200*630以上推奨、絶対パス">
+		<meta property="og:image:alt" content="画像の説明を簡潔に書く">
+		<meta property="og:locale" content="ja_JP">
+	
+		<!-- twitter -->
+		<meta name="twitter:title" content="wc - page02">
+		<meta name="twitter:description" content="page02のdescription">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:creator" content="@jcwcode">
+		<meta name="twitter:site" content="@jcwcode"> <!-- サイトの運営元となるTwitterアカウント -->
+		<meta name="twitter:image" content="絶対パス">
+	
+		<!-- ファビコン -->
+		<link rel="shortcut icon" href="" /><!-- favicon.ico 16*16、32*32、48*48 -->
+		<link rel="apple-touch-icon" sizes="180x180" href=""><!-- タッチアイコン 180*180のpng -->
+		<link rel="icon" type="image/png" sizes="192x192" href=""><!-- Android 192*192のpng-->
+		<link rel="mask-icon" href="svg" color="SafariがこのSVGに塗る色（テーマカラー）"><!-- Safari専用のピン留めアイコン用 -->
+		<link rel="canonical" href="https://example.com/index.html" /><!-- クローラーに正規のurlを伝える -->
+		<!-- クローラー -->
+		<!-- <meta name="robots" content="noindex,nofollow"> -->
+		
+
+		<!-- Googleフォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@400;700;900&display=swap" rel="stylesheet">
+		
+    <link rel="stylesheet" href="/src/styles/reset.css">
+		<link rel="stylesheet" type="text/css" href="/src/styles/style.css" />
+
+		<script>
+			document.documentElement.className="js";
+		</script>
+
+    <script defer type="module" src="/src/js/index.js"></script>
+	</head>
+	<body class="loading">
+
+    <!-- header -->
+    <header class="header">
+      <div class="header__title"> 
+        <h1 class="header__title-main">Image to Content Page Transition</h1> 
+        <a aria-label="Back to the article" class="header__title-back" href="https://tympanus.net/codrops/?p="> 
+          <span class="oh__inner">Back to the article</span> 
+          <svg width="18px" height="18px" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M18.25 15.5a.75.75 0 00.75-.75v-9a.75.75 0 00-.75-.75h-9a.75.75 0 000 1.5h7.19L6.22 16.72a.75.75 0 101.06 1.06L17.5 7.56v7.19c0 .414.336.75.75.75z"></path>
+          </svg>
+        </a> 
+      </div>
+      <a class="header__prev" href="http://tympanus.net/Development/GridLayoutAnimation/">Previous demo</a>
+    </header>
+
+		<main>
+
+			<!-- preview-wrap -->
+			<section class="preview-wrap">
+
+				<!-- preview -->
+				<div class="preview">
+					<div class="preview__img-wrap">
+            <div class="preview__img">
+							<!-- 一番下のこの要素がe.targetになる -->
+              <div
+								data-link="/src/pages/page01.html"
+								class="preview__img-inner" 
+								style="background-image:url(/img/lebron.avif)"
+							>
+							</div>
+            </div>
+          </div>
+
+					<div class="preview__title">
+						<h2 class="preview__title-main">
+							<span class="oh"><span class="oh__inner">LeBron</span></span>
+							<span class="oh"><span class="oh__inner">James</span></span>
+						</h2>
+						<p class="preview__desc">A four-time NBA champion known for his versatility, leadership, and basketball IQ.</p>
+					</div>
+				</div>
+				<!-- preview -->
+				
+				<div class="preview">
+					<div class="preview__img-wrap">
+            <div class="preview__img">
+							<!-- 一番下のこの要素がe.targetになる -->
+              <div
+								data-link="/src/pages/page02.html"
+								class="preview__img-inner" 
+								style="background-image:url(/img/curry.avif)"
+							>
+							</div>
+            </div>
+          </div>
+
+					<div class="preview__title">
+						<h2 class="preview__title-main">
+							<span class="oh"><span class="oh__inner">Stephen</span></span>
+							<span class="oh"><span class="oh__inner">Curry</span></span>
+						</h2>
+						<p class="preview__desc">Revolutionized the game with his deep three-point shooting and quick release.</p>
+					</div>
+				</div>
+				<!-- preview -->
+
+				<div class="preview">
+					<div class="preview__img-wrap">
+            <div class="preview__img">
+							<!-- 一番下のこの要素がe.targetになる -->
+              <div
+								data-link="/src/pages/page03.html"
+								class="preview__img-inner" 
+								style="background-image:url(/img/durant.avif)"
+							>
+							</div>
+            </div>
+          </div>
+
+					<div class="preview__title">
+						<h2 class="preview__title-main">
+							<span class="oh"><span class="oh__inner">Giannis</span></span>
+							<span class="oh"><span class="oh__inner">Antetokounmpo</span></span>
+						</h2>
+						<p class="preview__desc">A two-time MVP known for his dominance in the paint and relentless defense.</p>
+					</div>
+				</div>
+				<!-- preview -->
+
+				<div class="preview">
+					<div class="preview__img-wrap">
+            <div class="preview__img">
+							<!-- 一番下のこの要素がe.targetになる -->
+              <div
+								data-link="/src/pages/page04.html"
+								class="preview__img-inner" 
+								style="background-image:url(/img/giannis.avif)"
+							>
+							</div>
+            </div>
+          </div>
+
+					<div class="preview__title">
+						<h2 class="preview__title-main">
+							<span class="oh"><span class="oh__inner">Kevin</span></span>
+							<span class="oh"><span class="oh__inner">Durant</span></span>
+						</h2>
+						<p class="preview__desc">One of the most gifted scorers in NBA history with a smooth shooting stroke.</p>
+					</div>
+				</div>
+				<!-- preview -->
+			</section>
+			<!-- preview-wrap -->
+
+			<!-- content-wrap -->
+			<section class="content-wrap">
+
+				<!-- 
+						⭐️page01の状態
+						⭐️この中は遷移先から取得する 
+					-->
+				<!-- <div class="content__outer"> -->
+					<div class="content">
+						<!-- <div class="content__inner"> -->
+
+							<div class="content__group">
+									<div class="content__group-inner">
+										
+											<div class="content__title">
+												<span class="oh"><span class="oh__inner">Stephen</span></span>
+												<span class="oh"><span class="oh__inner">Curry</span></span>
+											</div>
+											<div class="content__meta oh"><span class="oh__inner">Curry oh__inner</span></div>
+											<div class="content__text">
+												Revolutionized the game with his deep three-point shooting and quick release.
+											</div>  
+										
+									</div> 
+							</div>
+							
+							<div class="content__thumbs">
+									<div class="content__thumbs-inner">
+										<!-- ⭐️TODO ここスライダーにしたらおもしろい -->
+										
+											<div class="content__thumbs-item" style="background-image:url(/img/2_1.avif)"></div>
+											<div class="content__thumbs-item" style="background-image:url(/img/2_2.avif)"></div>
+											<div class="content__thumbs-item" style="background-image:url(/img/2_3.avif)"></div>
+											<div class="content__thumbs-item" style="background-image:url(/img/2_4.avif)"></div> 
+										
+									</div> 
+							</div>
+						<!-- </div> -->
+						
+						<div class="content__preview-wrapper"></div>
+
+					</div>
+				<!-- </div> -->
+				<!-- ⭐️.contentの最後に、gsap.Flipで画像をぶち込む -->
+
+
+				<!-- 戻るボタン -->
+				<button class="unbutton action action--back">
+					<svg width="25px" height="25px" viewBox="0 0 25 25"><path d="M24 12.001H2.914l5.294-5.295-.707-.707L1 12.501l6.5 6.5.707-.707-5.293-5.293H24v-1z"/></svg>
+					<span>Go back</span>
+				</button>
+
+			</section>
+			<!-- content-wrap -->
+		</main>
+	</body>
+</html>
