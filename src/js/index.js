@@ -265,8 +265,9 @@ async function showContent(_work, isAnimate = true) {
   const adjacentPreviews = getAdjacentItems(_work);
   _work.adjacentPreviews = adjacentPreviews;
 
-  const content = document.querySelector(".content");
-  contentInstance = new Content(content);
+  const contentInner = document.querySelector("#js-content-inner");
+  // console.log(contentInner)
+  contentInstance = new Content(contentInner);
 
   document.body.classList.add("content-open");
 
@@ -289,7 +290,7 @@ async function showContent(_work, isAnimate = true) {
   _work.imageInnerScaleYCached = scaleY;
 
   const flipstate = Flip.getState(_work.$.image);
-  contentInstance.$.contentPreviewWrapper.appendChild(_work.$.image);
+  contentInstance.$.contentImageWrapper.appendChild(_work.$.image);
 
   await Promise.all([
     new Promise((resolve) => {

@@ -338,8 +338,12 @@ main {
 
 
 /* ✅ content */
-.content-wrap {
+.l-content{
 	margin-top: 200px;
+}
+
+.p-content {
+	padding: 2rem;
 	width: 100%;
 
 	grid-area: page;
@@ -351,9 +355,7 @@ main {
 	'content content';
 	grid-template-rows: auto 1fr;
 	pointer-events: none;
-	padding: 2rem;
 
-	/* position: absolute; */
 	position: fixed;
 	top: 0;
 }
@@ -385,18 +387,10 @@ main {
 	text-transform: uppercase;
 }
 
-/* .content__outer{
-	grid-area: content;
-	position: absolute;
-	top: 0;
-	left: 0;
-	pointer-events: none;
-	height: 100%;
-	opacity: 0;
-} */
 
-.content {
-	grid-area: content;
+.p-content__inner {
+	/* grid-area: text; */
+	/* grid-area: content; */
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -417,20 +411,15 @@ main {
 
 
 /* コンテンツをクリックできる様に */
-.content-open .content{
+.content-open .p-content__inner{
 	position: relative;
 	pointer-events: auto;
 	opacity: 1;
 }
 
 /* 画像がクリックできなくする */
-.content-open .content__preview-wrapper{
+.content-open .content__image-wrapper{
 	pointer-events: none;
-}
-
-
-.content__group {
-	grid-area: text;
 }
 
 .content__title {
@@ -451,12 +440,12 @@ main {
 	padding: 0 0 0 0.75rem;
 }
 
-.content .p-work__image-wrapper {
+.p-content__inner .p-work__image-wrapper {
 	grid-area: img;
 }
 
 /* 遷移先の画像はここにぶち込む */
-.content__preview-wrapper {
+.content__image-wrapper {
 	grid-area: img;
 
 	/* width: 100%;
@@ -545,7 +534,7 @@ main {
 		margin: -2.5rem auto 0;
 	}
 
-	.content {
+	.p-content__inner {
 		grid-template-columns: 60% 1fr;
 		grid-template-areas:
 		'... ...' 

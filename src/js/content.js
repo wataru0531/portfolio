@@ -52,13 +52,13 @@ export class Content {
   constructor(contentElement) {
     this.$ = {}
     this.$.el = contentElement;
-    // console.log(this.$.el); // <div class="content"></div>
+    // console.log(this.$.el); // <div class="content__inner"></div>
     
     // this.$.el.inner = this.$.el.querySelector(".content__inner");
     // ⭐️遷移先から要素を突っ込む用のラッパーのDOM
     this.$.contentGroupInner = this.$.el.querySelector(".content__group-inner");
     this.$.contentThumbsInner = this.$.el.querySelector(".content__thumbs-inner");
-    this.$.contentPreviewWrapper = this.$.el.querySelector(".content__preview-wrapper");
+    this.$.contentImageWrapper = this.$.el.querySelector(".content__image-wrapper");
 
     this.$.title = this.$.el.querySelector(".content__title");
     this.$.titleInner = [...this.$.title.querySelectorAll(".oh__inner")];
