@@ -2,6 +2,10 @@
 
 
 // ⭐️ここから
+// htmlのクラス名の修正、わかりやすくする
+// CSSを変更
+// jsの変数名などの修正
+
 // popstate、ページん遷移など、挙動の確認
 
 // aboutページの追加
@@ -29,13 +33,12 @@ gsap.registerPlugin(Flip);
 
 import { utils } from "./utils.js";
 // import { INode } from "./INode.js";
-import { Preview } from "./preview";
+import { Work } from "./work.js";
 import { Content } from "./content.js";
 
 const ANIMATION_CONFIG = { duration: 1.5, ease: "power4.inOut" };
 
-const previews = [...document.querySelectorAll(".preview")];
-const previewInstances = [];
+const works = [...document.querySelectorAll("#js-work")];
 
 const backBtn = document.querySelector(".action--back");
 
@@ -89,9 +92,10 @@ function animateOnScroll() {
 
 
 // .previewの初期化
-previews.forEach((preview, idx) => {
+const worksInstances = [];
+works.forEach((preview, idx) => {
   // console.log(preview) // .preview
-  previewInstances.push(new Preview(preview));
+  worksInstances.push(new Work(preview));
 });
 
 
@@ -117,7 +121,7 @@ utils.preloadImages(".preview__img-inner").then(async () => {
 
   // index.html以外に着地した時は、コンテンツを表示した状態にする
   if(path !== "/") {
-    const targetPreview = previewInstances.find((preview) => preview.$.link === path); // urlが一致するitemを取得
+    const targetPreview = worksInstances.find((preview) => preview.$.link === path); // urlが一致するitemを取得
     // console.log(targetPreview)
 
 		if(targetPreview){
@@ -202,10 +206,10 @@ function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name �
 
 // ✅ イベント関係の初期化　TODO イベント関係はすべてここにまとめる
 function initEventListeners() {
-  // console.log(previewInstances.entries());
+  // console.log(worksInstances.entries());
 
   // .previewのshowアニメーション
-  for(const [ idx, preview ] of previewInstances.entries()) {
+  for(const [ idx, preview ] of worksInstances.entries()) {
     preview.$.imageInner.addEventListener("click", async (event) => {
       if(isAnimating) return; // アニメーション中は処理を受け付けない
       isAnimating = true;
@@ -215,8 +219,8 @@ function initEventListeners() {
       currentPreviewIdx = idx;
       // console.log(currentPreviewIdx);
 
-      // console.log(previewInstances[currentPreviewIdx])
-      const previewPath = previewInstances[currentPreviewIdx].$.link;
+      // console.log(worksInstances[currentPreviewIdx])
+      const previewPath = worksInstances[currentPreviewIdx].$.link;
       // console.log(previewPath);
 
       await navigate(previewPath); // urlの更新、履歴に追加
@@ -234,13 +238,13 @@ function initEventListeners() {
 }
 
 // ✅ 指定したpreview以外で、ビューポートに少しでも入っているアイテムを配列に格納する処理
-function getAdjacentItems(_preview) {
+function getAdjacentItems(_work) {
   let array = [];
 
-  for (const [idx, preview] of previewInstances.entries()) {
-    // _preview != preview → 現在の_preview以外を次の判定に
+  for (const [idx, preview] of worksInstances.entries()) {
+    // _work != preview → 現在の_work以外を次の判定に
     // ⭐️utils.inInViewport → 他のインデックスのpreviewが判定される
-    if (_preview != preview && utils.isInViewport(preview.$.el)) {
+    if (_work != preview && utils.isInViewport(preview.$.el)) {
       array.push({ idx: idx, preview: preview });
     }
   }
@@ -250,16 +254,16 @@ function getAdjacentItems(_preview) {
 
 
 // ⭐️コンテンツを表示
-async function showContent(_preview, isAnimate = true) {
+async function showContent(_work, isAnimate = true) {
   lenis.stop();
 
   // duration に応じたアニメーション設定
   const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
 
-  const previewIndex = previewInstances.indexOf(_preview);
+  const previewIndex = worksInstances.indexOf(_work);
   // console.log(previewIndex)
-  const adjacentPreviews = getAdjacentItems(_preview);
-  _preview.adjacentPreviews = adjacentPreviews;
+  const adjacentPreviews = getAdjacentItems(_work);
+  _work.adjacentPreviews = adjacentPreviews;
 
   const content = document.querySelector(".content");
   contentInstance = new Content(content);
@@ -280,12 +284,12 @@ async function showContent(_preview, isAnimate = true) {
   });
 
   const scaleY =
-    _preview.$.imageInner.getBoundingClientRect().height /
-    _preview.$.imageInner.offsetHeight;
-  _preview.imageInnerScaleYCached = scaleY;
+    _work.$.imageInner.getBoundingClientRect().height /
+    _work.$.imageInner.offsetHeight;
+  _work.imageInnerScaleYCached = scaleY;
 
-  const flipstate = Flip.getState(_preview.$.image);
-  contentInstance.$.contentPreviewWrapper.appendChild(_preview.$.image);
+  const flipstate = Flip.getState(_work.$.image);
+  contentInstance.$.contentPreviewWrapper.appendChild(_work.$.image);
 
   await Promise.all([
     new Promise((resolve) => {
@@ -301,25 +305,25 @@ async function showContent(_preview, isAnimate = true) {
       });
     }),
 
-    gsap.to(_preview.$.titleInner, {
+    gsap.to(_work.$.titleInner, {
       yPercent: 101,
       opacity: 0,
       stagger: -0.03,
       ...config,
     }),
 
-    gsap.to(_preview.$.description, {
+    gsap.to(_work.$.description, {
       yPercent: 101,
       opacity: 0,
       ...config,
     }),
 
-    gsap.to(_preview.$.imageInner, {
+    gsap.to(_work.$.imageInner, {
       scaleY: 1,
       ...config,
     }),
 
-    ..._preview.adjacentPreviews.map((el) =>
+    ..._work.adjacentPreviews.map((el) =>
       gsap.to(el.preview.$.el, {
         y: el.idx < previewIndex ? -window.innerHeight : window.innerHeight,
         ...config,
@@ -395,7 +399,7 @@ function attachBackButton() {
 
       const path = window.location.pathname; // ここで、パスを取得 → パスに見合った.previewを渡す
       // console.log(path); // /src/pages/page01.html 遷移前のurlを取得
-      const targetPreview = previewInstances.find((preview) => preview.$.link === path); 
+      const targetPreview = worksInstances.find((preview) => preview.$.link === path); 
       // console.log(targetPreview);
 
       await navigate("/"); // url更新、ブラウザの履歴に記録
@@ -447,7 +451,7 @@ window.addEventListener("popstate", async (event) => {
   // index.htmlに着地 ... 他ページ から index.htmlに戻る時
   if(path === "/") {
     // console.log(previousPath);
-    const targetPreview = previewInstances.find((preview) => preview.$.link === previousPath);
+    const targetPreview = worksInstances.find((preview) => preview.$.link === previousPath);
     
     // console.log(path);
     await hideContent(targetPreview);
@@ -464,7 +468,7 @@ window.addEventListener("popstate", async (event) => {
   if(path !== "/"){
     // console.log(previousPath);
     const url = window.location.pathname;
-    const targetPreview = previewInstances.find((preview) => preview.$.link === url);
+    const targetPreview = worksInstances.find((preview) => preview.$.link === url);
 
     await loadPage(url);
     await showContent(targetPreview); // コンテンツを表示
@@ -480,11 +484,11 @@ window.addEventListener("popstate", async (event) => {
 
 
 // コンテンツを非表示する
-async function hideContent(_preview) {
-  // console.log(_preview);
+async function hideContent(_work) {
+  // console.log(_work);
   
-  const flipstate = Flip.getState(_preview.$.image); // FLIPの現状を記録
-  _preview.$.imageWrap.appendChild(_preview.$.image);  // FLIPの移動先(motonoichi)を記録
+  const flipstate = Flip.getState(_work.$.image); // FLIPの現状を記録
+  _work.$.imageWrapper.appendChild(_work.$.image);  // FLIPの移動先(motonoichi)を記録
 
   contentInstance.multiLine.out(); // 下部のテキストアニメーション。TODO 非同期に
 
@@ -514,13 +518,13 @@ async function hideContent(_preview) {
       ...ANIMATION_CONFIG,
     }),
 
-    gsap.to(_preview.adjacentPreviews.map((el) => el.preview.$.el), {
+    gsap.to(_work.adjacentPreviews.map((el) => el.preview.$.el), {
       y: 0, // ずらしたアイテムを元に戻す
       delay: 0.15,
       ...ANIMATION_CONFIG,
     }),
 
-    gsap.to(_preview.$.titleInner, {
+    gsap.to(_work.$.titleInner, {
       yPercent: 0,
       opacity: 1,
       stagger: 0.03,
@@ -528,15 +532,15 @@ async function hideContent(_preview) {
       ...ANIMATION_CONFIG,
     }),
 
-    gsap.to(_preview.$.description, {
+    gsap.to(_work.$.description, {
       yPercent: 0,
       opacity: 1,
       delay: 0.15,
       ...ANIMATION_CONFIG,
     }),
 
-    gsap.to(_preview.$.imageInner, {
-      scaleY: _preview.imageInnerScaleYCached,
+    gsap.to(_work.$.imageInner, {
+      scaleY: _work.imageInnerScaleYCached,
       delay: 0.15,
       ...ANIMATION_CONFIG,
     }),
