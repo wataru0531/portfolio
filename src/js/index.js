@@ -91,16 +91,16 @@ function animateOnScroll() {
 }
 
 
-// .previewの初期化
+// .workの初期化
 const worksInstances = [];
-works.forEach((preview, idx) => {
-  // console.log(preview) // .preview
-  worksInstances.push(new Work(preview));
+works.forEach((work, idx) => {
+  // console.log(work) // .work
+  worksInstances.push(new Work(work));
 });
 
 
 // ✅ 初期化処理
-utils.preloadImages(".preview__img-inner").then(async () => {
+document.addEventListener("DOMContentLoaded", async() => {
   if(isAnimating) return; // アニメーション中は処理を受け付けない
   isAnimating = true;
 
@@ -111,26 +111,44 @@ utils.preloadImages(".preview__img-inner").then(async () => {
 
   await loadPage(path); // 着地したページをロード
 
-  // console.log("then")
-  document.body.classList.remove("loading");
-
-  initSmoothScrolling(); // Lenisの初期化
+  initSmoothScrolling(); // Lenis初期化
   // animateOnScroll(); // 画像、タイトルのスクロールアニメーション
 
   initEventListeners(); // イベント関係の初期化。showContentなど
 
   // index.html以外に着地した時は、コンテンツを表示した状態にする
   if(path !== "/") {
-    const targetPreview = worksInstances.find((preview) => preview.$.link === path); // urlが一致するitemを取得
-    // console.log(targetPreview)
+    const targetWork = worksInstances.find((work) => work.$.link === path); // urlが一致するitemを取得
+    // console.log(targetWork)
 
-		if(targetPreview){
-			await showContent(targetPreview, false); // アニメーションはさせない
+		if(targetWork){
+			await showContent(targetWork, false); // アニメーションはさせない
 		}
   }
 
   isAnimating = false;
 });
+
+
+// 一つ前のページのurlを持つ
+let previousPath = window.location.pathname;
+
+// ⭐️プラウザに履歴を残す。履歴を辿れるように設定する → そのページの状態をオブジェクトに格納しておくことができる。
+// ⭐️history.pushState(state, title, url);
+//  → ブラウザの戻るボタンや進むボタン によって、この変更が反映された履歴を辿れるようになる
+// history → ブラウザの履歴
+// ✅state: 遷移先のページに渡したい、保持したいデータを渡す。⭐️popstateのイベントオブジェクトで取得できる
+// ✅title: ページのタイトル
+// ✅url: 遷移先のページのパスを渡す
+async function navigate(_url) { // 遷移先のurl
+  // console.log(_url)
+  // ⭐️遷移前のurlを取得 →　pushStateに渡す。
+
+  previousPath = _url;
+  // console.log(previousPath);
+
+  history.pushState({ path: _url }, "", _url);
+}
 
 
 // ⭐️着地したページ、遷移先のDOMを取得、挿入
@@ -142,14 +160,14 @@ async function loadPage(_url) {
     // console.log(html); // Response {type: 'basic', url: 'http://127.0.0.1:5500/about.html', redirected: false, status: 200, ok: true, …}
 
     const htmlString = await html.text(); // 遷移先のhtmlを全て取得(文字列)
-    // console.log(htmlString); // 単なる文字列
+    // console.log(typeof htmlString, htmlString); // string, 文字列で全て取得
 
     // console.log(parser.parseFromString(htmlString, "text/html")); // #document { http://127.0.0.1:5500/ }
     // → HTML Documentオブジェクト を取得
     const parsedHtml = parser.parseFromString(htmlString, "text/html");
     // console.log(parsedHtml); // 遷移先のhtmlを取得。#document (http://localhost:5173/src/pages/page01.html)
 
-		const parsedTitle = parsedHtml.querySelector("title"); // headタグ内の更新
+		const parsedTitle = parsedHtml.querySelector("title"); // ⭐️ headタグ内の更新をしていく
     // console.log(parsedTitle)
 		if(parsedTitle) document.title = parsedTitle.textContent;
 
@@ -162,8 +180,6 @@ async function loadPage(_url) {
 			const charset = meta.getAttribute("charset");
       // console.log(name, httpEquiv, charset)
 			if(charset !== null || httpEquiv !== null || (name === "viewport")) return;
-
-			// console.log(meta);
 
 			if(meta.hasAttribute("name")) { // nameの場合の処理
 				updateMetaTagByAttr("name", meta.getAttribute("name"), meta.getAttribute("content"));
@@ -190,13 +206,14 @@ async function loadPage(_url) {
 // ✅ headタグ内のmetaデータを更新(上書き)
 function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name か content)
   let selector = _attr === "name" ? `meta[name="${_name}"]` : `meta[property="${_name}"]`;
+  // console.log(selector);
   let tag = document.head.querySelector(selector);
 	// console.log(tag);
 
   if(tag) {
     tag.setAttribute("content", _content); // ⭐️上書きして更新
   } else {
-    tag = document.createElement("meta"); // tagがなければここで生成して挿入する
+    tag = document.createElement("meta"); // ⭐️ tagがなければここで生成して挿入する
     tag.setAttribute(_attr, _name); // _attr → name か property の属性
     tag.setAttribute("content", _content); // content
     document.head.appendChild(tag);
@@ -253,11 +270,12 @@ function getAdjacentItems(_work) {
 }
 
 
-// ⭐️コンテンツを表示
-async function showContent(_work, isAnimate = true) {
+// ✅ コンテンツを表示
+async function showContent(_work, isAnimate = true) { // index.html以外はアニメーションさせない
+  // console.log(_work); // Work {$: {…}}
   lenis.stop();
 
-  // duration に応じたアニメーション設定
+  // ページに応じたアニメーション設定
   const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
 
   const previewIndex = worksInstances.indexOf(_work);
@@ -416,26 +434,6 @@ function attachBackButton() {
 
 
 
-// 一つ前のページのurlを持つ
-let previousPath = window.location.pathname;
-
-// ⭐️プラウザに履歴を残す。履歴を辿れるように設定する 
-// そのページの状態をオブジェクトに格納しておくことができる。
-// ⭐️history.pushState(state, title, url);
-//  ブラウザの戻るボタンや進むボタン によって、この変更が反映された履歴を辿れるようになる
-// history → ブラウザの履歴
-// ✅state: 遷移先のページに渡したい、保持したいデータを渡す。⭐️popstateのイベントオブジェクトで取得できる
-// ✅title: ページのタイトル
-// ✅url: 遷移先のページのパスを渡す
-async function navigate(_url) { // 遷移先のurl
-  // console.log(_url)
-  // ⭐️遷移前のurlを取得 →　pushStateに渡す。
-
-  previousPath = _url;
-  // console.log(previousPath);
-
-  history.pushState({ path: _url }, "", _url);
-}
 
 // ⭐️ブラウザの戻る/進むボタンで発火。.popは取り出す、stateは状態という意味
 window.addEventListener("popstate", async (event) => {

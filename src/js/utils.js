@@ -290,12 +290,12 @@ function easeInOut(t){
 }
 
 
-// 各要素を、ラップする処理
+// ✅ 各要素を、ラップする処理
 // elems ... [span.char, span.char, span.char, span.char, span.char, span.char, span.char, span.char, span.char]
 // wrapType ... 文字をラップした要素
 // wrapClass ... それに付与したいクラス
 function wrapElements(elements, wrapType, wrapClass){
-  elements.forEach(element => { // .element
+  elements.forEach(element => {
     const wrapElement = document.createElement(wrapType);
     wrapElement.classList = wrapClass; 
     

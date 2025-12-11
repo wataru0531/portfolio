@@ -38,7 +38,6 @@
 		<!-- クローラー -->
 		<!-- <meta name="robots" content="noindex,nofollow"> -->
 		
-
 		<!-- Googleフォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,7 +52,7 @@
 
     <script defer type="module" src="/src/js/index.js"></script>
 	</head>
-	<body class="loading">
+	<body>
 
     <!-- header -->
     <header class="header">
@@ -174,34 +173,29 @@
 
 			<!-- content-wrap -->
 			<section class="l-content p-content">
-
 				<!-- 
-						⭐️page01の状態
-						⭐️この中は遷移先から取得する 
-					-->
-					<div class="p-content__inner" id="js-content-inner">
-						<div class="content__group-inner">
-							<div class="content__title">
-								<span class="oh"><span class="oh__inner">Giannis</span></span>
-								<span class="oh"><span class="oh__inner">Antetokounmpo</span></span>
-							</div>
-							<div class="content__meta oh"><span class="oh__inner">Giannis oh__inner</span></div>
-							<div class="content__text">
-								A two-time MVP known for his dominance in the paint and relentless defense.
-							</div>  
-							
-						</div> 
-				
-						<div class="content__thumbs-inner">
-							<div class="content__thumbs-item" style="background-image:url(/img/3_1.avif)"></div>
-							<div class="content__thumbs-item" style="background-image:url(/img/3_2.avif)"></div>
-							<div class="content__thumbs-item" style="background-image:url(/img/3_3.avif)"></div>
-							<div class="content__thumbs-item" style="background-image:url(/img/3_4.avif)"></div> 
-						</div> 
-						<div class="content__image-wrapper"></div>
-					</div>
-				<!-- ⭐️.contentの最後に、gsap.Flipで画像をぶち込む -->
-
+					⭐️page01の状態
+					⭐️この中は遷移先から取得する 
+				-->
+				<div class="p-content__inner" id="js-content-inner">
+					<div class="content__group-inner">
+						<div class="content__title">
+							<span class="oh"><span class="oh__inner">Giannis</span></span>
+							<span class="oh"><span class="oh__inner">Antetokounmpo</span></span>
+						</div>
+						<div class="content__meta oh"><span class="oh__inner">Giannis oh__inner</span></div>
+						<div class="content__text">
+							A two-time MVP known for his dominance in the paint and relentless defense.
+						</div>  
+					</div> 
+					<div class="content__thumbs-inner">
+						<div class="content__thumbs-item" style="background-image:url(/img/3_1.avif)"></div>
+						<div class="content__thumbs-item" style="background-image:url(/img/3_2.avif)"></div>
+						<div class="content__thumbs-item" style="background-image:url(/img/3_3.avif)"></div>
+						<div class="content__thumbs-item" style="background-image:url(/img/3_4.avif)"></div> 
+					</div> 
+					<div class="content__image-wrapper"></div>
+				</div>
 
 				<!-- 戻るボタン -->
 				<button class="unbutton action action--back">

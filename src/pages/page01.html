@@ -53,7 +53,7 @@
 
     <script defer type="module" src="/src/js/index.js"></script>
 	</head>
-	<body class="loading">
+	<body>
 
     <!-- header -->
     <header class="header">
@@ -173,14 +173,14 @@
 			<!-- l-works -->
 
 			<!-- content-wrap -->
-			<section class="content-wrap">
+			<section class="l-content p-content">
 
 				<!-- 
 						⭐️page01の状態
 						⭐️この中は遷移先から取得する 
 					-->
 				<!-- <div class="content__outer"> -->
-					<div class="l-content p-content">
+					<div class="p-content__inner" id="js-content-inner">
 						<div class="content__group-inner">
 								<div class="content__title">
 									<span class="oh"><span class="oh__inner">LeBron</span></span>
@@ -190,11 +190,8 @@
 								<div class="content__text">
 									A four-time NBA champion known for his versatility, leadership, and basketball IQ.
 								</div>  
-							
 						</div> 
-						<div class="content__thumbs-inner">
-							<!-- ⭐️TODO ここスライダーにしたらおもしろい -->
-							
+						<div class="content__thumbs-inner">							
 								<div class="content__thumbs-item" style="background-image:url(/img/1_1.avif)"></div>
 								<div class="content__thumbs-item" style="background-image:url(/img/1_2.avif)"></div>
 								<div class="content__thumbs-item" style="background-image:url(/img/1_3.avif)"></div>

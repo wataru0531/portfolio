@@ -49,9 +49,9 @@
 import { TextLinesReveal } from "./textLinesReveal";
 
 export class Content {
-  constructor(contentElement) {
+  constructor(_contentInner) {
     this.$ = {}
-    this.$.el = contentElement;
+    this.$.el = _contentInner;
     // console.log(this.$.el); // <div class="content__inner"></div>
     
     // this.$.el.inner = this.$.el.querySelector(".content__inner");
