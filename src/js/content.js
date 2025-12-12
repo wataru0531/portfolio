@@ -64,8 +64,9 @@ export class Content {
     this.$.titleInner = [...this.$.title.querySelectorAll(".oh__inner")];
     this.$.metaInner = this.$.el.querySelector(".content__meta > .oh__inner");
     this.$.text = this.$.el.querySelector(".content__text");
-    this.multiLine = new TextLinesReveal(this.$.text); // ⭐️テキストラインの初期化
+    this.multiLine = new TextLinesReveal(this.$.text); // ⭐️ テキスト分割、アニメーション
                                                         // → この時点ではまだテキスト
+
     this.$.thumbs = [...this.$.el.querySelectorAll(".content__thumbs-item")];
   }
 }

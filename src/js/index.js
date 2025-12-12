@@ -43,7 +43,7 @@ const works = [...document.querySelectorAll("#js-work")];
 const backBtn = document.querySelector(".action--back");
 
 let lenis;
-let currentPreviewIdx = -1;
+let currentWorkIdx = -1;
 let isAnimating = false;
 
 const parser = new DOMParser(); // 文字列を実際のDOMに変換するパーサー
@@ -194,6 +194,8 @@ async function loadPage(_url) {
     const parsedContentThumbsInner = parsedHtml.querySelector(".content__thumbs-inner");
     // console.log(parsedContentGroupInner);
 
+    // 👉 content__group-inner > 
+
     // DOMに挿入する
     contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
     contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
@@ -226,25 +228,25 @@ function initEventListeners() {
   // console.log(worksInstances.entries());
 
   // .previewのshowアニメーション
-  for(const [ idx, preview ] of worksInstances.entries()) {
-    preview.$.imageInner.addEventListener("click", async (event) => {
+  for(const [ idx, work ] of worksInstances.entries()) {
+    work.$.imageInner.addEventListener("click", async (event) => {
       if(isAnimating) return; // アニメーション中は処理を受け付けない
       isAnimating = true;
 
       // console.log(event.target)
 
-      currentPreviewIdx = idx;
-      // console.log(currentPreviewIdx);
+      currentWorkIdx = idx;
+      // console.log(currentWorkIdx);
 
-      // console.log(worksInstances[currentPreviewIdx])
-      const previewPath = worksInstances[currentPreviewIdx].$.link;
-      // console.log(previewPath);
+      // console.log(worksInstances[currentWorkIdx])
+      const workPath = worksInstances[currentWorkIdx].$.link;
+      // console.log(workPath);
 
-      await navigate(previewPath); // urlの更新、履歴に追加
+      await navigate(workPath); // urlの更新、履歴に追加
 
-      await loadPage(previewPath); // ページ読み込み
+      await loadPage(workPath); // ページ読み込み
       
-      await showContent(preview); // ⭐️コンテンツ表示
+      await showContent(work); // ⭐️コンテンツ表示
 
       isAnimating = false;
     });
@@ -278,14 +280,15 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
   // ページに応じたアニメーション設定
   const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
 
-  const previewIndex = worksInstances.indexOf(_work);
-  // console.log(previewIndex)
+  const workIndex = worksInstances.indexOf(_work);
+  // console.log(workIndex)
   const adjacentPreviews = getAdjacentItems(_work);
   _work.adjacentPreviews = adjacentPreviews;
 
   const contentInner = document.querySelector("#js-content-inner");
   // console.log(contentInner)
-  contentInstance = new Content(contentInner);
+
+  contentInstance = new Content(contentInner); // ⭐️ Content初期化
 
   document.body.classList.add("content-open");
 
@@ -344,7 +347,7 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
 
     ..._work.adjacentPreviews.map((el) =>
       gsap.to(el.preview.$.el, {
-        y: el.idx < previewIndex ? -window.innerHeight : window.innerHeight,
+        y: el.idx < workIndex ? -window.innerHeight : window.innerHeight,
         ...config,
       })
     ),
@@ -393,6 +396,7 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
 
         setTimeout(() => {
           contentInstance.multiLine.in(isAnimate); // ライン
+
           gsap.set(contentInstance.$.text, {
             opacity: 1,
             duration: .3,

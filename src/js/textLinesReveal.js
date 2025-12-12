@@ -14,22 +14,31 @@ import { utils } from "./utils.js";
 
 export class TextLinesReveal {
   constructor(_el) {
+    // console.log(_el)
     this.$ = {};
     this.$.el = _el; // .content__text
 
     this.timerId = null;
 
-    this.SplitTypeInstance = new SplitText(this.$el, { types: "lines" })
+    this.SplitTypeInstance = new SplitText(this.$.el, { type: "lines" })
 		// console.log(this.SplitTypeInstance); // SplitType {isSplit: true, settings: {…}, elements: Array(1), lines: Array(7), words: Array(0), …}
-    
+  
 		// 1行1行(.line)を、<div class="oh"></div>でラップ
     // console.log(this.SplitTypeInstance.lines); // (7) [div.line, div.line, div.line, div.line, div.line, div.line, div.line]
-		// utils.wrapElements(this.SplitTypeInstance.lines, "div", "oh");
+		utils.wrapElements(this.SplitTypeInstance.lines, "div", "oh");
     this.initEvents();
+  }
+
+  splitAgain(){ // 👉 改めて分割 ... 他のページからDOMを取得すれば、うまく分割できないため
+    // console.log(this)
+    this.SplitTypeInstance.split();
   }
 
   // コンテンツを表示
   in(animation = true) { // falseを渡すと
+    this.splitAgain();
+    utils.wrapElements(this.SplitTypeInstance.lines, "div", "oh");
+
     // console.log(animation)
     this.isVisible = true; // 
 
