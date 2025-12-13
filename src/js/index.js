@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async() => {
   const path = window.location.pathname === "/" ? "/" : window.location.pathname;
   // console.log(path); // /src/pages/page01.html
 
-  await navigate(path); // ブラウザに履歴を残す
+  await pushHistory(path); // ブラウザに履歴を残す
 
   await loadPage(path); // 着地したページをロード
 
@@ -130,8 +130,8 @@ document.addEventListener("DOMContentLoaded", async() => {
 });
 
 
-// 一つ前のページのurlを持つ
-let previousPath = window.location.pathname;
+// ✅ 遷移前のurlとして持つ
+let previousPath = window.location.pathname; // 現在表示中のパス
 
 // ⭐️プラウザに履歴を残す。履歴を辿れるように設定する → そのページの状態をオブジェクトに格納しておくことができる。
 // ⭐️history.pushState(state, title, url);
@@ -140,15 +140,73 @@ let previousPath = window.location.pathname;
 // ✅state: 遷移先のページに渡したい、保持したいデータを渡す。⭐️popstateのイベントオブジェクトで取得できる
 // ✅title: ページのタイトル
 // ✅url: 遷移先のページのパスを渡す
-async function navigate(_url) { // 遷移先のurl
+async function pushHistory(_url) { // 👉 遷移先のurlを渡す
   // console.log(_url)
-  // ⭐️遷移前のurlを取得 →　pushStateに渡す。
 
-  previousPath = _url;
+  previousPath = _url; // 👉 遷移前のurlとして更新 →　pushStateに渡す。
   // console.log(previousPath);
 
-  history.pushState({ path: _url }, "", _url);
+  history.pushState({ path: _url }, "AAA", _url); // 👉 popstateでeventに渡せる
+                                                  // 第2引数 → headタブ内のtitleを変更(現在は意味がない)
+                                                  // 第3引数 → アドレスバーのパスを_urlに変更
 }
+
+
+// ✅ ブラウザの戻る/進むボタンで発火。.pop 取り出す、state 状態
+// popstate → 発火してもブラウザに履歴は残らない
+// 👉 TODO ... aboutページ追加した時の挙動もプラス
+window.addEventListener("popstate", async (e) => {
+  // console.log(e.state.path) → pushStateの時に渡したオブジェクトのデータを取得できる
+  if(isAnimating) return; 
+  isAnimating = true;
+
+  try{
+    const path = e.state.path || "/"; // 遷移先のパス。なければ、/
+    // console.log(path);
+
+    if(path === previousPath) return;
+
+    // ✅ index.htmlに着地 ... 他ページ から index.htmlに戻る時
+    // TODO → aboutページから着地の場合
+    if(path === "/") {
+      // console.log(previousPath);
+      const targetWork = worksInstances.find((work) => work.$.link === previousPath);
+
+      await hideContent(targetWork);
+
+      await loadPage(path); // 遷移先(index.html)のページをロード
+
+      previousPath = path; // previousPathを更新
+
+      // isAnimating = false;
+      return;
+    }
+
+    // ✅ 他ページに着地 →　index.html から 他ページに戻るとき
+    if(path !== "/"){
+      // console.log(previousPath);
+      const url = window.location.pathname;
+      const targetWork = worksInstances.find((work) => work.$.link === url);
+
+      await loadPage(url);
+      await showContent(targetWork); // コンテンツを表示
+
+      previousPath = url;
+
+      // isAnimating = false;
+      return;
+    }
+
+    // ✅ aboutページ
+    // if(path == "about"){
+
+    // }
+
+  } finally {
+    isAnimating = false; // 必ずfalseにしておく
+  }
+
+});
 
 
 // ⭐️着地したページ、遷移先のDOMを取得、挿入
@@ -190,11 +248,10 @@ async function loadPage(_url) {
 			}
 		});
 
+    // ✅ コンテンツの文章部分、サムネイル部分を読み込む
     const parsedContentGroupInner = parsedHtml.querySelector(".content__group-inner");
     const parsedContentThumbsInner = parsedHtml.querySelector(".content__thumbs-inner");
     // console.log(parsedContentGroupInner);
-
-    // 👉 content__group-inner > 
 
     // DOMに挿入する
     contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
@@ -242,7 +299,7 @@ function initEventListeners() {
       const workPath = worksInstances[currentWorkIdx].$.link;
       // console.log(workPath);
 
-      await navigate(workPath); // urlの更新、履歴に追加
+      await pushHistory(workPath); // urlの更新、履歴に追加
 
       await loadPage(workPath); // ページ読み込み
       
@@ -252,8 +309,7 @@ function initEventListeners() {
     });
   }
 
-  // 戻るボタンの初期化
-  attachBackButton();
+  attachBackButton(); // 戻るボタンの初期化
 }
 
 // ✅ クリックしたwork以外で、ビューポートに少しでも入っているアイテムを配列に格納する処理
@@ -495,7 +551,7 @@ async function hideContent(_work) {
 }
 
 
-// ⭐️ 戻るボタン → ここではどんな時もindex.htmlに戻す
+// ⭐️ 戻るボタン → どんな時もindex.htmlに戻す
 function attachBackButton() {
   const backBtn = document.querySelector(".action--back");
 
@@ -504,66 +560,19 @@ function attachBackButton() {
       if(isAnimating) return; // アニメーション中は処理を受け付けない
       isAnimating = true;
 
-      const path = window.location.pathname; // ここで、パスを取得 → パスに見合った.previewを渡す
+      const path = window.location.pathname;
       // console.log(path); // /src/pages/page01.html 遷移前のurlを取得
-      const targetPreview = worksInstances.find((preview) => preview.$.link === path); 
-      // console.log(targetPreview);
-
-      await navigate("/"); // url更新、ブラウザの履歴に記録
+      const targetWork = worksInstances.find((work) => work.$.link === path); 
+      // console.log(targetWork);
     
-      await hideContent(targetPreview); // ⭐️コンテンツ非表示
+      await hideContent(targetWork); // ⭐️コンテンツ非表示
 
       await loadPage("/");
+
+      await pushHistory("/"); // url更新、ブラウザの履歴に記録
 
       isAnimating = false;
     });
   }
 }
-
-
-// ⭐️ブラウザの戻る/進むボタンで発火。.pop 取り出す、state 状態
-window.addEventListener("popstate", async (event) => {
-  // console.log(event)
-  // ⭐️event.state → pushStateの時に渡したオブジェクトのデータを取得できる
-  if(isAnimating) return; // アニメーション中は処理を受け付けない
-  isAnimating = true;
-
-  const path = event.state.path || "/"; // 遷移先のパス。なければ、/
-  // console.log(path);
-
-  if(path === previousPath) return; // 最初に着地したページから戻る/進むを選択できる場合は処理を中断
-
-  // index.htmlに着地 ... 他ページ から index.htmlに戻る時
-  if(path === "/") {
-    // console.log(previousPath);
-    const targetWork = worksInstances.find((work) => work.$.link === previousPath);
-    
-    // console.log(path);
-    await hideContent(targetWork);
-
-    await loadPage(path); // 遷移先(index.html)のページをロード
-
-    previousPath = path; // previousPathを更新
-
-    isAnimating = false;
-    return;
-  }
-
-  // 他ページに着地 →　index.html から 他ページに戻るとき
-  if(path !== "/"){
-    // console.log(previousPath);
-    const url = window.location.pathname;
-    const targetWork = worksInstances.find((work) => work.$.link === url);
-
-    await loadPage(url);
-    await showContent(targetWork); // コンテンツを表示
-
-    previousPath = url;
-
-    isAnimating = false;
-    return;
-  }
-
-  isAnimating = false;
-});
 
