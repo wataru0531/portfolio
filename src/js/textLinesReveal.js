@@ -1,10 +1,6 @@
 
 // ✅ テキスト分割、アニメーション
 
-// TODO 
-// SplitTypeからgsapの
-
-
 import { gsap } from "gsap";
 import SplitText from "gsap/SplitText";
 gsap.registerPlugin(SplitText);
@@ -17,7 +13,7 @@ export class TextLinesReveal {
     // console.log(_el)
     this.$ = {};
     this.$.el = _el; // .content__text
-
+    this.isVisible = false;
     this.timerId = null;
 
     this.SplitTypeInstance = new SplitText(this.$.el, { type: "lines" })
@@ -35,7 +31,7 @@ export class TextLinesReveal {
   }
 
   // コンテンツを表示
-  in(animation = true) { // falseを渡すと
+  in(animation = true) {
     this.splitAgain();
     utils.wrapElements(this.SplitTypeInstance.lines, "div", "oh");
 
@@ -48,8 +44,7 @@ export class TextLinesReveal {
 
     this.inTimeline = gsap .timeline({
       defaults: { duration: 1.5, ease: "power4.inOut" },
-		})
-		.addLabel("start", 0)
+		}).addLabel("start", 0)
 		.set(this.SplitTypeInstance.lines, {
 			yPercent: 105,
 		}, "start");

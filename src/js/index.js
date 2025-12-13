@@ -118,11 +118,11 @@ document.addEventListener("DOMContentLoaded", async() => {
 
   // index.html以外に着地した時は、コンテンツを表示した状態にする
   if(path !== "/") {
-    const targetWork = worksInstances.find((work) => work.$.link === path); // urlが一致するitemを取得
+    const targetWork = worksInstances.find((work) => work.$.link === path); // urlが一致するworkを取得
     // console.log(targetWork)
 
 		if(targetWork){
-			await showContent(targetWork, false); // アニメーションはさせない
+			await showContent(targetWork, false); // アニメーションはさせnai
 		}
   }
 
@@ -256,15 +256,14 @@ function initEventListeners() {
   attachBackButton();
 }
 
-// ✅ 指定したpreview以外で、ビューポートに少しでも入っているアイテムを配列に格納する処理
+// ✅ クリックしたwork以外で、ビューポートに少しでも入っているアイテムを配列に格納する処理
 function getAdjacentItems(_work) {
   let array = [];
 
-  for (const [idx, preview] of worksInstances.entries()) {
-    // _work != preview → 現在の_work以外を次の判定に
-    // ⭐️utils.inInViewport → 他のインデックスのpreviewが判定される
-    if (_work != preview && utils.isInViewport(preview.$.el)) {
-      array.push({ idx: idx, preview: preview });
+  for (const [idx, work] of worksInstances.entries()) {
+    // _work != work → 現在の_work以外を次の判定に
+    if (_work != work && utils.isInViewport(work.$.el)) { // ビューポート内に入っているかどうka
+      array.push({ idx: idx, work: work });
     }
   }
 
@@ -282,8 +281,8 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
 
   const workIndex = worksInstances.indexOf(_work);
   // console.log(workIndex)
-  const adjacentPreviews = getAdjacentItems(_work);
-  _work.adjacentPreviews = adjacentPreviews;
+  const adjacentWorks = getAdjacentItems(_work);
+  _work.adjacentWorks = adjacentWorks;
 
   const contentInner = document.querySelector("#js-content-inner");
   // console.log(contentInner)
@@ -305,15 +304,16 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
     opacity: 0,
   });
 
+  // ⭐️ TODO
   const scaleY =
-    _work.$.imageInner.getBoundingClientRect().height /
-    _work.$.imageInner.offsetHeight;
+    _work.$.imageInner.getBoundingClientRect().height / _work.$.imageInner.offsetHeight;
+    // console.log(scaleY);
   _work.imageInnerScaleYCached = scaleY;
 
   const flipstate = Flip.getState(_work.$.image);
   contentInstance.$.contentImageWrapper.appendChild(_work.$.image);
 
-  await Promise.all([
+  await Promise.all([ // 👉 実際にPromiseオブジェクトを返しているのは、new Promiseのみ。gsap.toは解決済みとなる。
     new Promise((resolve) => {
       Flip.from(flipstate, {
         duration: config.duration,
@@ -330,7 +330,7 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
     gsap.to(_work.$.titleInner, {
       yPercent: 101,
       opacity: 0,
-      stagger: -0.03,
+      stagger: - 0.03,
       ...config,
     }),
 
@@ -345,9 +345,9 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
       ...config,
     }),
 
-    ..._work.adjacentPreviews.map((el) =>
-      gsap.to(el.preview.$.el, {
-        y: el.idx < workIndex ? -window.innerHeight : window.innerHeight,
+    ..._work.adjacentWorks.map((el) =>
+      gsap.to(el.work.$.el, {
+        y: el.idx < workIndex ? - window.innerHeight : window.innerHeight,
         ...config,
       })
     ),
@@ -362,7 +362,7 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
     gsap.to(contentInstance.$.titleInner, {
       yPercent: 0,
       opacity: 1,
-      stagger: -0.05,
+      stagger: - 0.05,
       delay: isAnimate ? 0.15 : 0,
       ...config,
     }),
@@ -411,81 +411,6 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
 }
 
 
-// ⭐️戻るボタン → ここではどんな時もindex.htmlに戻す
-function attachBackButton() {
-  const backBtn = document.querySelector(".action--back");
-
-  if(backBtn) {
-    backBtn.addEventListener("click", async () => {
-      if(isAnimating) return; // アニメーション中は処理を受け付けない
-      isAnimating = true;
-
-      const path = window.location.pathname; // ここで、パスを取得 → パスに見合った.previewを渡す
-      // console.log(path); // /src/pages/page01.html 遷移前のurlを取得
-      const targetPreview = worksInstances.find((preview) => preview.$.link === path); 
-      // console.log(targetPreview);
-
-      await navigate("/"); // url更新、ブラウザの履歴に記録
-    
-      await hideContent(targetPreview); // ⭐️コンテンツ非表示
-
-      await loadPage("/");
-
-      isAnimating = false;
-    });
-  }
-}
-
-
-
-
-// ⭐️ブラウザの戻る/進むボタンで発火。.popは取り出す、stateは状態という意味
-window.addEventListener("popstate", async (event) => {
-  // console.log(event)
-  // ⭐️event.state → pushStateの時に渡したオブジェクトのデータを取得できる
-  if(isAnimating) return; // アニメーション中は処理を受け付けない
-  isAnimating = true;
-
-  const path = event.state.path || "/"; // 遷移先のパス。なければ、/
-  // console.log(path);
-
-  if(path === previousPath) return; // 最初に着地したページから戻る/進むを選択できる場合は処理を中断
-
-  // index.htmlに着地 ... 他ページ から index.htmlに戻る時
-  if(path === "/") {
-    // console.log(previousPath);
-    const targetPreview = worksInstances.find((preview) => preview.$.link === previousPath);
-    
-    // console.log(path);
-    await hideContent(targetPreview);
-
-    await loadPage(path); // 遷移先(index.html)のページをロード
-
-    previousPath = path; // previousPathを更新
-
-    isAnimating = false;
-    return;
-  }
-
-  // 他ページに着地 →　index.html から 他ページに戻るとき
-  if(path !== "/"){
-    // console.log(previousPath);
-    const url = window.location.pathname;
-    const targetPreview = worksInstances.find((preview) => preview.$.link === url);
-
-    await loadPage(url);
-    await showContent(targetPreview); // コンテンツを表示
-
-    previousPath = url;
-
-    isAnimating = false;
-    return;
-  }
-
-  isAnimating = false;
-});
-
-
 // コンテンツを非表示する
 async function hideContent(_work) {
   // console.log(_work);
@@ -521,7 +446,7 @@ async function hideContent(_work) {
       ...ANIMATION_CONFIG,
     }),
 
-    gsap.to(_work.adjacentPreviews.map((el) => el.preview.$.el), {
+    gsap.to(_work.adjacentWorks.map((el) => el.work.$.el), {
       y: 0, // ずらしたアイテムを元に戻す
       delay: 0.15,
       ...ANIMATION_CONFIG,
@@ -568,3 +493,77 @@ async function hideContent(_work) {
     document.body.classList.remove("content-open");
   })
 }
+
+
+// ⭐️ 戻るボタン → ここではどんな時もindex.htmlに戻す
+function attachBackButton() {
+  const backBtn = document.querySelector(".action--back");
+
+  if(backBtn) {
+    backBtn.addEventListener("click", async () => {
+      if(isAnimating) return; // アニメーション中は処理を受け付けない
+      isAnimating = true;
+
+      const path = window.location.pathname; // ここで、パスを取得 → パスに見合った.previewを渡す
+      // console.log(path); // /src/pages/page01.html 遷移前のurlを取得
+      const targetPreview = worksInstances.find((preview) => preview.$.link === path); 
+      // console.log(targetPreview);
+
+      await navigate("/"); // url更新、ブラウザの履歴に記録
+    
+      await hideContent(targetPreview); // ⭐️コンテンツ非表示
+
+      await loadPage("/");
+
+      isAnimating = false;
+    });
+  }
+}
+
+
+// ⭐️ブラウザの戻る/進むボタンで発火。.pop 取り出す、state 状態
+window.addEventListener("popstate", async (event) => {
+  // console.log(event)
+  // ⭐️event.state → pushStateの時に渡したオブジェクトのデータを取得できる
+  if(isAnimating) return; // アニメーション中は処理を受け付けない
+  isAnimating = true;
+
+  const path = event.state.path || "/"; // 遷移先のパス。なければ、/
+  // console.log(path);
+
+  if(path === previousPath) return; // 最初に着地したページから戻る/進むを選択できる場合は処理を中断
+
+  // index.htmlに着地 ... 他ページ から index.htmlに戻る時
+  if(path === "/") {
+    // console.log(previousPath);
+    const targetWork = worksInstances.find((work) => work.$.link === previousPath);
+    
+    // console.log(path);
+    await hideContent(targetWork);
+
+    await loadPage(path); // 遷移先(index.html)のページをロード
+
+    previousPath = path; // previousPathを更新
+
+    isAnimating = false;
+    return;
+  }
+
+  // 他ページに着地 →　index.html から 他ページに戻るとき
+  if(path !== "/"){
+    // console.log(previousPath);
+    const url = window.location.pathname;
+    const targetWork = worksInstances.find((work) => work.$.link === url);
+
+    await loadPage(url);
+    await showContent(targetWork); // コンテンツを表示
+
+    previousPath = url;
+
+    isAnimating = false;
+    return;
+  }
+
+  isAnimating = false;
+});
+

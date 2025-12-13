@@ -69,13 +69,13 @@ function isInViewport(_el){
   // console.log(left); // ページの左から要素の左まで
 
   return (
-    ( 
+    ( // ① 縦を検証
       // bottom が0以上、かつ、bottom がビューポートの高さ以下の時、または、
       // top が0以上、かつ、top がビューポートの高さ以下の時
       bottom >= 0 && bottom <= (window.innerHeight || document.documentElement.clientHeight) || 
       top >= 0 && top <= (window.innerHeight || document.documentElement.clientHeight)
     ) &&
-    (
+    ( // ② 横を検証
       // rightが0以上、 かつ、ビューポートの幅より小さい時 または、
       // leftが0以上、かつ、ビューポートの幅より小さい時
       right >= 0 && right <= (window.innerWidth || document.documentElement.clientWidth) || 
@@ -294,8 +294,9 @@ function easeInOut(t){
 // elems ... [span.char, span.char, span.char, span.char, span.char, span.char, span.char, span.char, span.char]
 // wrapType ... 文字をラップした要素
 // wrapClass ... それに付与したいクラス
-function wrapElements(elements, wrapType, wrapClass){
+function wrapElements(elements, wrapType, wrapClass){ // ([], "div", "oh")
   elements.forEach(element => {
+    // console.log(element)
     const wrapElement = document.createElement(wrapType);
     wrapElement.classList = wrapClass; 
     
