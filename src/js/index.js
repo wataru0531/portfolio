@@ -146,11 +146,29 @@ async function pushHistory(_url) { // 👉 遷移先のurlを渡す
   previousPath = _url; // 👉 遷移前のurlとして更新 →　pushStateに渡す。
   // console.log(previousPath);
 
-  history.pushState({ path: _url }, "AAA", _url); // 👉 popstateでeventに渡せる
+  history.pushState({ path: _url }, "", _url); // 👉 popstateでeventに渡せる
                                                   // 第2引数 → headタブ内のtitleを変更(現在は意味がない)
                                                   // 第3引数 → アドレスバーのパスを_urlに変更
 }
 
+
+// ✅ パスの正規化 → ページ名のみを取得
+function normalizePath(_pathname){
+  // 受け取る値：
+  // "/", "/pages/page01.html", "/pages/about.html" など。
+  return pathname
+    .replace(/^\/pages/, "") // "/pages/page01.html" → "/page01.html"
+    .replace(/\.html$/, "")  // "/page01.html" → "/page01"
+}
+
+// ✅ ページ種別判定
+function getPageType(_path){
+  // console.log(_path); // "/", "/page01/02/03...", "/about" のどれか
+  if(_path === "/") return "home";
+  if(_path === "/pages/about") return "about";
+  if(_path.starsWith("/page")) return "work";
+  return unknown;
+}
 
 // ✅ ブラウザの戻る/進むボタンで発火。.pop 取り出す、state 状態
 // popstate → 発火してもブラウザに履歴は残らない
@@ -161,30 +179,38 @@ window.addEventListener("popstate", async (e) => {
   isAnimating = true;
 
   try{
-    const path = e.state.path || "/"; // 遷移先のパス。なければ、/
+    const path = e.state?.path || window.location.pathname || "/"; // 遷移先のパス。なければ、/
     // console.log(path);
+    const normalizedPath = normalizePath(path);
+    // console.log(normalizedPath); // /page01
 
-    if(path === previousPath) return;
+    if(path === previousPath) return; // ページが変わらなければ処理終わり
 
-    // ✅ index.htmlに着地 ... 他ページ から index.htmlに戻る時
+    // ✅ 他のページから、index.htmlに遷移する時 ... 他ページ から index.htmlに戻る時
     // TODO → aboutページから着地の場合
     if(path === "/") {
-      // console.log(previousPath);
+      // console.log(path)
+      // ✅ 各アイテムページ → index.htmlに遷移の場合
       const targetWork = worksInstances.find((work) => work.$.link === previousPath);
-
       await hideContent(targetWork);
 
       await loadPage(path); // 遷移先(index.html)のページをロード
 
       previousPath = path; // previousPathを更新
 
-      // isAnimating = false;
+      // ✅ aboutページ → index.htmlに遷移の場合
+      // if(path === "/about"){}
+      
       return;
     }
 
-    // ✅ 他ページに着地 →　index.html から 他ページに戻るとき
+    // ✅ index.html以外に遷移する時
+    // → index.html → 各アイテムページに遷移
+    //   index.html → aboutページ
+    //   各アイテムページ → aboutページに遷移
     if(path !== "/"){
-      // console.log(previousPath);
+      // console.log(path); // /pages/page01.html
+      // ✅ index.html から 各アイテムページに遷移する時
       const url = window.location.pathname;
       const targetWork = worksInstances.find((work) => work.$.link === url);
 
@@ -193,7 +219,9 @@ window.addEventListener("popstate", async (e) => {
 
       previousPath = url;
 
-      // isAnimating = false;
+      // ✅ 各アイテムページから aboutページに遷移
+      // if(){}
+      
       return;
     }
 
@@ -209,8 +237,68 @@ window.addEventListener("popstate", async (e) => {
 });
 
 
-// ⭐️着地したページ、遷移先のDOMを取得、挿入
+// window.addEventListener("popstate", async (e) => {
+//   if (isAnimating) return
+//   isAnimating = true
+
+//   try {
+//     const rawPath = e.state?.path || window.location.pathname || "/"
+//     const path = normalizePath(rawPath)
+
+//     if (path === previousPath) return
+
+//     const pageType = getPageType(path)
+
+//     switch (pageType) {
+//       case "home": {
+//         if (previousPath !== "/") {
+//           const prevWork = worksInstances.find(
+//             work => work.$.link === previousPath
+//           )
+//           if (prevWork) {
+//             await hideContent(prevWork)
+//           }
+//         }
+
+//         await loadPage("/")
+//         previousPath = "/"
+//         break
+//       }
+
+//       case "work": {
+//         const work = worksInstances.find(
+//           work => work.$.link === path
+//         )
+
+//         await loadPage(path)
+//         if (work) {
+//           await showContent(work)
+//         }
+
+//         previousPath = path
+//         break
+//       }
+
+//       case "about": {
+//         await loadPage("/about")
+//         previousPath = "/about"
+//         break
+//       }
+
+//       default:
+//         console.warn("Unknown route:", path)
+//     }
+//   } finally {
+//     isAnimating = false
+//   }
+// })
+
+
+
+
+// ⭐️着地したページの内容を更新
 // TODO aboutページなら、main全てを入れ替え
+
 async function loadPage(_url) {
   // console.log(_url);
   try {
@@ -225,11 +313,12 @@ async function loadPage(_url) {
     const parsedHtml = parser.parseFromString(htmlString, "text/html");
     // console.log(parsedHtml); // 遷移先のhtmlを取得。#document (http://localhost:5173/src/pages/page01.html)
 
+    // ✅ タイトルの更新
 		const parsedTitle = parsedHtml.querySelector("title"); // ⭐️ headタグ内の更新をしていく
     // console.log(parsedTitle)
 		if(parsedTitle) document.title = parsedTitle.textContent;
 
-		// ⭐️ metaタグ内の処理
+		// ✅ metaタグ内の更新
 		[...parsedHtml.head.querySelectorAll("meta")].forEach(meta => {
 			// console.log(meta);
 
@@ -248,14 +337,16 @@ async function loadPage(_url) {
 			}
 		});
 
-    // ✅ コンテンツの文章部分、サムネイル部分を読み込む
+    // ✅ コンテンツの文章部分、サムネイル部分の更新
     const parsedContentGroupInner = parsedHtml.querySelector(".content__group-inner");
     const parsedContentThumbsInner = parsedHtml.querySelector(".content__thumbs-inner");
     // console.log(parsedContentGroupInner);
 
-    // DOMに挿入する
     contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
     contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
+
+    // ✅ aboutページ更新
+    
   } catch (error) {
     // ⭐️404の処理
     // app.innerHTML = '<h1>404 - Not Found</h1>';

@@ -5,7 +5,6 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>wc | about</title>
-
 		<meta name="description" content="indexのdescription" />
 		<meta name="keywords" content="SEO,検索エンジン,チェックツール" /><!-- ３～５個程度のキーワードを記述するのが一般的。必要ないとも言われている。 -->
 		<meta name="author" content="Wataru Yasukawa" />
@@ -59,21 +58,50 @@
     <header class="header">
       <div class="header__title"> 
         <h1 class="header__title-main">Image to Content Page Transition</h1> 
-        <a aria-label="Back to the article" class="header__title-back" href="https://tympanus.net/codrops/?p="> 
+        <a aria-label="Back to the article" class="header__title-back" href=""> 
           <span class="oh__inner">Back to the article</span> 
           <svg width="18px" height="18px" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M18.25 15.5a.75.75 0 00.75-.75v-9a.75.75 0 00-.75-.75h-9a.75.75 0 000 1.5h7.19L6.22 16.72a.75.75 0 101.06 1.06L17.5 7.56v7.19c0 .414.336.75.75.75z"></path>
           </svg>
         </a> 
       </div>
-      <a class="header__prev" href="http://tympanus.net/Development/GridLayoutAnimation/">Previous demo</a>
+      <a class="header__prev" href="/pages/about.html">Previous demo</a>
     </header>
     <!-- header -->
     
 
 		<main>
       <!-- TODO mainの中をすべて遷移時に書き換える -->
-			<section class="about">
-        
+			<section class="p-about">
+        <div class="p-about__innter">
+					<div class="p-about__header">
+						<div class="p-about__title">
+							<h1>Aboutページ</h1>
+						</div>
+						<div class="p-about__subtitle">サブタイトル</div>
+					</div>
+					<div class="p-about__discription">
+						このページは私について記述します.
+					</div>
+				</div>
+				<div class="p-about__contents">
+					<figure class="p-about__img">
+						<img src="/img/wataru.avif" alt="">
+					</figure>
+					<div class="p-about__profiles">
+						<div class="p-about__profile p-profile">
+							<div class="p-profile__title">profile</div>
+							<div class="p-profile__congents">
+								<p class="p-profile__hobby">趣味：絵画(色鉛筆)、筋トレ、銭湯・サウナ</p>
+							</div>
+						</div>
+						<div class="p-about__skill p-skill">
+							<div class="p-skill__title">skill</div>
+							<div class="p-skill__skills">
+								HTML / CSS / Sass(SCSS) / JavaScript / WordPress / EJS / gulp / webpack / React / Next.js / WebGL
+							</div>
+						</div>
+					</div>
+				</div>	
       </section>
 
 		</main>
