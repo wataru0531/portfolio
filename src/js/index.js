@@ -156,17 +156,18 @@ async function pushHistory(_url) { // 👉 遷移先のurlを渡す
 function normalizePath(_pathname){
   // 受け取る値：
   // "/", "/pages/page01.html", "/pages/about.html" など。
-  return pathname
+  return _pathname
     .replace(/^\/pages/, "") // "/pages/page01.html" → "/page01.html"
-    .replace(/\.html$/, "")  // "/page01.html" → "/page01"
+    .replace(/\.html$/, "")  // "/page01.html" → ⭐️ "/page01" として返す
 }
 
-// ✅ ページ種別判定
+// ✅ ページ種別判定 
+// →「URL文字列で分岐しないため」、「ルーティングの“意味”を一箇所に集約するため」
 function getPageType(_path){
   // console.log(_path); // "/", "/page01/02/03...", "/about" のどれか
   if(_path === "/") return "home";
   if(_path === "/pages/about") return "about";
-  if(_path.starsWith("/page")) return "work";
+  if(_path.startsWith("/page")) return "work";
   return unknown;
 }
 
@@ -181,53 +182,71 @@ window.addEventListener("popstate", async (e) => {
   try{
     const path = e.state?.path || window.location.pathname || "/"; // 遷移先のパス。なければ、/
     // console.log(path);
-    const normalizedPath = normalizePath(path);
+    const normalizedPath = normalizePath(path); // 👉 パスの正規化
     // console.log(normalizedPath); // /page01
 
     if(path === previousPath) return; // ページが変わらなければ処理終わり
 
-    // ✅ 他のページから、index.htmlに遷移する時 ... 他ページ から index.htmlに戻る時
-    // TODO → aboutページから着地の場合
-    if(path === "/") {
-      // console.log(path)
-      // ✅ 各アイテムページ → index.htmlに遷移の場合
-      const targetWork = worksInstances.find((work) => work.$.link === previousPath);
-      await hideContent(targetWork);
+    const pathType = getPageType(path); // 👉 ページの種別を取得
+    // console.log(pathType);
+    
+    switch (pathType){
+      // ✅　index.htmlに遷移時 
+      case "home": {
+        const targetWork = worksInstances.find((work) => work.$.link === previousPath);
+        await hideContent(targetWork);
 
-      await loadPage(path); // 遷移先(index.html)のページをロード
+        await loadPage("/"); // 遷移先(index.html)のページをロード
 
-      previousPath = path; // previousPathを更新
+        previousPath = "/"; // previousPathを更新
 
-      // ✅ aboutページ → index.htmlに遷移の場合
-      // if(path === "/about"){}
-      
-      return;
+        break;
+      }
+
+      // ✅ 各ページ遷移時
+      case "work": {
+        const url = window.location.pathname;
+        const targetWork = worksInstances.find((work) => work.$.link === url);
+
+        await loadPage(url);
+        await showContent(targetWork); // コンテンツを表示
+
+        previousPath = url;
+
+        break
+      }
+
+      // ✅ aboutページ遷移時
+      case "about": {
+        // await loadPage("/about"); // ⭐️ TODO
+
+        previousPath = "/about";
+
+        break
+      }
+
+      default: console.warn("Unknown route: ", path)
     }
 
     // ✅ index.html以外に遷移する時
     // → index.html → 各アイテムページに遷移
     //   index.html → aboutページ
     //   各アイテムページ → aboutページに遷移
-    if(path !== "/"){
-      // console.log(path); // /pages/page01.html
-      // ✅ index.html から 各アイテムページに遷移する時
-      const url = window.location.pathname;
-      const targetWork = worksInstances.find((work) => work.$.link === url);
+    // if(path !== "/"){
+    //   // console.log(path); // /pages/page01.html
+    //   // ✅ index.html から 各アイテムページに遷移する時
+    //   // const url = window.location.pathname;
+    //   // const targetWork = worksInstances.find((work) => work.$.link === url);
 
-      await loadPage(url);
-      await showContent(targetWork); // コンテンツを表示
+    //   // await loadPage(url);
+    //   // await showContent(targetWork); // コンテンツを表示
 
-      previousPath = url;
+    //   // previousPath = url;
 
-      // ✅ 各アイテムページから aboutページに遷移
-      // if(){}
+    //   // ✅ 各アイテムページから aboutページに遷移
+    //   // if(){}
       
-      return;
-    }
-
-    // ✅ aboutページ
-    // if(path == "about"){
-
+    //   return;
     // }
 
   } finally {
@@ -375,7 +394,7 @@ function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name �
 function initEventListeners() {
   // console.log(worksInstances.entries());
 
-  // .previewのshowアニメーション
+  // 各Workクリック時
   for(const [ idx, work ] of worksInstances.entries()) {
     work.$.imageInner.addEventListener("click", async (event) => {
       if(isAnimating) return; // アニメーション中は処理を受け付けない
@@ -660,10 +679,9 @@ function attachBackButton() {
 
       await loadPage("/");
 
-      await pushHistory("/"); // url更新、ブラウザの履歴に記録
+      await pushHistory("/"); // ブラウザの履歴に記録
 
       isAnimating = false;
     });
   }
 }
-
