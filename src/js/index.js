@@ -41,6 +41,7 @@ const ANIMATION_CONFIG = { duration: 1.5, ease: "power4.inOut" };
 const works = [...document.querySelectorAll("#js-work")];
 
 const backBtn = document.querySelector(".action--back");
+const headerAboutBtn = document.getElementById("js-header-about-btn");
 
 let lenis;
 let currentWorkIdx = -1;
@@ -153,26 +154,32 @@ async function pushHistory(_url) { // 👉 遷移先のurlを渡す
 
 
 // ✅ パスの正規化 → ページ名のみを取得
-function normalizePath(_pathname){
-  // 受け取る値：
-  // "/", "/pages/page01.html", "/pages/about.html" など。
-  return _pathname
-    .replace(/^\/pages/, "") // "/pages/page01.html" → "/page01.html"
-    .replace(/\.html$/, "")  // "/page01.html" → ⭐️ "/page01" として返す
-}
+// function normalizePath(_pathname){
+//   // 受け取る値：
+//   // "/", "/pages/page01.html", "/pages/about.html" など。
+//   return _pathname
+//     .replace(/^\/pages/, "") // "/pages/page01.html" → "/page01.html"
+//     .replace(/\.html$/, "")  // "/page01.html" → ⭐️ "/page01" として返す
+// }
+
+
+
+
+// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
+// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️
 
 // ✅ ページ種別判定 
 // →「URL文字列で分岐しないため」、「ルーティングの“意味”を一箇所に集約するため」
 function getPageType(_path){
-  // console.log(_path); // "/", "/page01/02/03...", "/about" のどれか
+  // console.log(_path); // /, /pages/page01.html, /pages/about.html
   if(_path === "/") return "home";
-  if(_path === "/pages/about") return "about";
+  if(_path === "/pages/about.html") return "about";
   if(_path.startsWith("/page")) return "work";
   return unknown;
 }
 
-// ✅ ブラウザの戻る/進むボタンで発火。.pop 取り出す、state 状態
-// popstate → 発火してもブラウザに履歴は残らない
+// ✅ ブラウザの戻る/進むで発火。.pop 取り出す、state 状態
+// popstate → 発火してもブラウザに履歴は残らない。pushStateで残る
 // 👉 TODO ... aboutページ追加した時の挙動もプラス
 window.addEventListener("popstate", async (e) => {
   // console.log(e.state.path) → pushStateの時に渡したオブジェクトのデータを取得できる
@@ -182,13 +189,14 @@ window.addEventListener("popstate", async (e) => {
   try{
     const path = e.state?.path || window.location.pathname || "/"; // 遷移先のパス。なければ、/
     // console.log(path);
-    const normalizedPath = normalizePath(path); // 👉 パスの正規化
+
+    // const normalizedPath = normalizePath(path); // 👉 パスの正規化
     // console.log(normalizedPath); // /page01
 
     if(path === previousPath) return; // ページが変わらなければ処理終わり
 
     const pathType = getPageType(path); // 👉 ページの種別を取得
-    // console.log(pathType);
+    // console.log(pathType); // home about work
     
     switch (pathType){
       // ✅　index.htmlに遷移時 
@@ -218,7 +226,7 @@ window.addEventListener("popstate", async (e) => {
 
       // ✅ aboutページ遷移時
       case "about": {
-        // await loadPage("/about"); // ⭐️ TODO
+        await loadPage("/about"); // ⭐️ TODO
 
         previousPath = "/about";
 
@@ -228,27 +236,6 @@ window.addEventListener("popstate", async (e) => {
       default: console.warn("Unknown route: ", path)
     }
 
-    // ✅ index.html以外に遷移する時
-    // → index.html → 各アイテムページに遷移
-    //   index.html → aboutページ
-    //   各アイテムページ → aboutページに遷移
-    // if(path !== "/"){
-    //   // console.log(path); // /pages/page01.html
-    //   // ✅ index.html から 各アイテムページに遷移する時
-    //   // const url = window.location.pathname;
-    //   // const targetWork = worksInstances.find((work) => work.$.link === url);
-
-    //   // await loadPage(url);
-    //   // await showContent(targetWork); // コンテンツを表示
-
-    //   // previousPath = url;
-
-    //   // ✅ 各アイテムページから aboutページに遷移
-    //   // if(){}
-      
-    //   return;
-    // }
-
   } finally {
     isAnimating = false; // 必ずfalseにしておく
   }
@@ -256,70 +243,11 @@ window.addEventListener("popstate", async (e) => {
 });
 
 
-// window.addEventListener("popstate", async (e) => {
-//   if (isAnimating) return
-//   isAnimating = true
-
-//   try {
-//     const rawPath = e.state?.path || window.location.pathname || "/"
-//     const path = normalizePath(rawPath)
-
-//     if (path === previousPath) return
-
-//     const pageType = getPageType(path)
-
-//     switch (pageType) {
-//       case "home": {
-//         if (previousPath !== "/") {
-//           const prevWork = worksInstances.find(
-//             work => work.$.link === previousPath
-//           )
-//           if (prevWork) {
-//             await hideContent(prevWork)
-//           }
-//         }
-
-//         await loadPage("/")
-//         previousPath = "/"
-//         break
-//       }
-
-//       case "work": {
-//         const work = worksInstances.find(
-//           work => work.$.link === path
-//         )
-
-//         await loadPage(path)
-//         if (work) {
-//           await showContent(work)
-//         }
-
-//         previousPath = path
-//         break
-//       }
-
-//       case "about": {
-//         await loadPage("/about")
-//         previousPath = "/about"
-//         break
-//       }
-
-//       default:
-//         console.warn("Unknown route:", path)
-//     }
-//   } finally {
-//     isAnimating = false
-//   }
-// })
-
-
-
-
-// ⭐️着地したページの内容を更新
-// TODO aboutページなら、main全てを入れ替え
-
+/////////////// ✅ 着地したページの内容に更新 //////////////////////////////
+// ⭐️ TODO aboutページなら、main全てを入れ替え
 async function loadPage(_url) {
-  // console.log(_url);
+  // console.log(_url); // /, /pages/page01.html, /pages/about.html
+
   try {
     const html = await fetch(_url); // ページデータを取得
     // console.log(html); // Response {type: 'basic', url: 'http://127.0.0.1:5500/about.html', redirected: false, status: 200, ok: true, …}
@@ -332,13 +260,41 @@ async function loadPage(_url) {
     const parsedHtml = parser.parseFromString(htmlString, "text/html");
     // console.log(parsedHtml); // 遷移先のhtmlを取得。#document (http://localhost:5173/src/pages/page01.html)
 
-    // ✅ タイトルの更新
-		const parsedTitle = parsedHtml.querySelector("title"); // ⭐️ headタグ内の更新をしていく
+    renderHeadMetaData(parsedHtml); // 👉 headタグ内の更新
+
+    const pageType = getPageType(_url); // 👉 各ページを更新
+    // console.log(pageType)
+    switch (pageType) {
+      case "home":
+        renderHomePage(parsedHtml);
+        break;
+      case "work":
+        renderWorkPage(parsedHtml);
+        break;
+      case "about":
+        renderAboutPage(parsedHtml);
+        break;
+      
+      default:
+        renderNotFoundPage();
+    }
+    
+  } catch (error) {
+    console.error("[LoadPage error]", error);
+    renderNotFoundPage();
+  }
+}
+
+
+// ヘッダタグ内の更新
+function renderHeadMetaData(_parsedHtml){
+  // console.log(_parsedHtml)
+  const parsedTitle = _parsedHtml.querySelector("title"); // ⭐️ headタグ内の更新をしていく
     // console.log(parsedTitle)
 		if(parsedTitle) document.title = parsedTitle.textContent;
 
 		// ✅ metaタグ内の更新
-		[...parsedHtml.head.querySelectorAll("meta")].forEach(meta => {
+		[..._parsedHtml.head.querySelectorAll("meta")].forEach(meta => {
 			// console.log(meta);
 
 			const name = meta.getAttribute("name"); // 👉 これら3つは更新しない。
@@ -356,21 +312,8 @@ async function loadPage(_url) {
 			}
 		});
 
-    // ✅ コンテンツの文章部分、サムネイル部分の更新
-    const parsedContentGroupInner = parsedHtml.querySelector(".content__group-inner");
-    const parsedContentThumbsInner = parsedHtml.querySelector(".content__thumbs-inner");
-    // console.log(parsedContentGroupInner);
-
-    contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
-    contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
-
-    // ✅ aboutページ更新
-    
-  } catch (error) {
-    // ⭐️404の処理
-    // app.innerHTML = '<h1>404 - Not Found</h1>';
-  }
 }
+
 
 // ✅ headタグ内のmetaデータを更新(上書き)
 function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name か content)
@@ -389,18 +332,49 @@ function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name �
   }
 }
 
+// ✅ トップページの更新
+function renderHomePage(_parsedHtml){
+  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
+  const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
+  // console.log(parsedContentGroupInner);
+
+  contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
+  contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
+}
+
+// ✅ 各Workページの更新
+function renderWorkPage(_parsedHtml){
+  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
+  const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
+  // console.log(parsedContentGroupInner);
+
+  contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
+  contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
+}
+
+// ✅　aboutページの更新
+function renderAboutPage(_parsedHtml){
+  const main = _parsedHtml.querySelector("main");
+  document.querySelector("main").innerHTML = main.innerHtml;
+}
+
+// ✅　404ページの更新
+function renderNotFoundPage(_parsedHtml){
+  const main = _parsedHtml.querySelector("main");
+  document.querySelector("main").innerHTML = main.innerHtml;
+}
+
+
 
 // ✅ イベント関係の初期化　TODO イベント関係はすべてここにまとめる
 function initEventListeners() {
   // console.log(worksInstances.entries());
 
-  // 各Workクリック時
+  // 👉　各Workクリック時
   for(const [ idx, work ] of worksInstances.entries()) {
     work.$.imageInner.addEventListener("click", async (event) => {
       if(isAnimating) return; // アニメーション中は処理を受け付けない
       isAnimating = true;
-
-      // console.log(event.target)
 
       currentWorkIdx = idx;
       // console.log(currentWorkIdx);
@@ -418,6 +392,21 @@ function initEventListeners() {
       isAnimating = false;
     });
   }
+
+  // 👉 aboutボタンクリック ... aboutページ遷移
+  headerAboutBtn.addEventListener("click", async (e) => {
+    if(isAnimating) return;
+    isAnimating = true;
+    
+    const link = e.currentTarget.dataset.link;
+    // console.log(link)
+
+    await pushHistory(link);
+
+    await loadPage(link);
+
+    isAnimating = false;
+  })
 
   attachBackButton(); // 戻るボタンの初期化
 }

@@ -205,6 +205,17 @@ main {
 	grid-area: prev;
 }
 
+.header__about-btn{
+		text-decoration: none;
+		color: var(--color-link);
+		outline: none;
+		cursor: pointer;
+
+		margin: 1rem 0 0;
+		justify-self: start;
+		/* writing-mode: vertical-rl; */
+		/* transform: rotate(180deg); */
+	}
 
 /* ✅ preview-wrap */
 /* .preview-wrap { */
@@ -473,7 +484,6 @@ main {
 	.header__prev,
 	#cdawrap {
 		justify-self: start;
-		-webkit-writing-mode: vertical-rl;
 		writing-mode: vertical-rl;
 		transform: rotate(180deg);
 	}
@@ -489,6 +499,20 @@ main {
 	.header__title-back {
 		transform: scale3d(1,-1,1);
 	}
+
+	/* .header__about-btn{
+		text-decoration: none;
+		color: var(--color-link);
+		outline: none;
+		cursor: pointer;
+
+		margin: 1rem 0 0;
+		justify-self: start;
+		writing-mode: vertical-rl;
+		transform: rotate(180deg);
+	} */
+
+
 
 	.p-work {
 		min-height: 90vh;
