@@ -4,16 +4,16 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>wc | page04</title>
-		<meta name="description" content="page04のdescription" />
+		<title>wc | work03</title>
+		<meta name="description" content="work03のdescription" />
 		<meta name="keywords" content="SEO,検索エンジン,チェックツール" /><!-- ３～５個程度のキーワードを記述するのが一般的。必要ないとも言われている。 -->
 		<meta name="author" content="Wataru Yasukawa" />
-		<meta name="theme-color" content="#000000"> <!-- モバイルブラウザのアドレスバーの色。PWA対応やデザインの一貫性に役立つ -->
+		<meta name="theme-color" content="#000000"><!-- モバイルブラウザのアドレスバーの色。PWA対応やデザインの一貫性に役立つ -->
 
 		<!-- OGP -->
-		<meta property="og:title" content="wc | page04">
+		<meta property="og:title" content="wc | work03">
 		<meta property="og:site_name" content="wc">
-		<meta property="og:description" content="page04 のog description">
+		<meta property="og:description" content="work03のog:description">
 		<meta property="og:type" content="article">
 		
 		<meta property="og:url" content="このページのURL。絶対パス">
@@ -22,7 +22,7 @@
 		<meta property="og:locale" content="ja_JP">
 	
 		<!-- twitter -->
-		<meta name="twitter:title" content="wc - page04">
+		<meta name="twitter:title" content="wc - work03">
 		<meta name="twitter:description" content="twitterのdescription">
 		<meta name="twitter:card" content="summary_large_image">
 		<meta name="twitter:creator" content="@jcwcode">
@@ -38,7 +38,6 @@
 		<!-- クローラー -->
 		<!-- <meta name="robots" content="noindex,nofollow"> -->
 		
-
 		<!-- Googleフォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,7 +58,7 @@
     <header class="header">
       <div class="header__title"> 
         <h1 class="header__title-main">Image to Content Page Transition</h1> 
-        <a aria-label="Back to the article" class="header__title-back" href=""> 
+        <a aria-label="Back to the article" class="header__title-back" href="https://tympanus.net/codrops/?p="> 
           <span class="oh__inner">Back to the article</span> 
           <svg width="18px" height="18px" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M18.25 15.5a.75.75 0 00.75-.75v-9a.75.75 0 00-.75-.75h-9a.75.75 0 000 1.5h7.19L6.22 16.72a.75.75 0 101.06 1.06L17.5 7.56v7.19c0 .414.336.75.75.75z"></path>
           </svg>
@@ -67,7 +66,7 @@
       </div>
 			<button
 				class="header__about" 
-				id="js-header-about"
+				id="js-header-about-btn"
 				data-link="/pages/about.html"
 			>aboutページ</button>
 		</header>
@@ -84,7 +83,7 @@
               <div
 								class="p-work__image"
 								id="js-work-image"  
-								data-link="/pages/page01.html"
+								data-link="/pages/work01.html"
 								style="background-image:url(/img/lebron.avif)"
 							> <!-- 元preview__img-inner -->
 							</div>
@@ -107,8 +106,8 @@
             <div class="p-work__image-wrapper" id="js-work-image-wrapper">
 							<!-- 一番下のこの要素がe.targetになる -->
               <div
-								data-link="/pages/page02.html"
-								class="p-work__image"
+								data-link="/pages/work02.html"
+								class="p-work__image" 
 								id="js-work-image" 
 								style="background-image:url(/img/curry.avif)"
 							>
@@ -131,7 +130,7 @@
             <div class="p-work__image-wrapper" id="js-work-image-wrapper">
 							<!-- 一番下のこの要素がe.targetになる -->
               <div
-								data-link="/pages/page03.html"
+								data-link="/pages/work03.html"
 								class="p-work__image" 
 								id="js-work-image" 
 								style="background-image:url(/img/durant.avif)"
@@ -150,13 +149,12 @@
 				</div>
 				<!-- p-work -->
 
-				<!-- p-work -->
 				<div class="p-work">
 					<div class="p-work__image-inner" id="js-work-image-inner">
             <div class="p-work__image-wrapper" id="js-work-image-wrapper">
 							<!-- 一番下のこの要素がe.targetになる -->
               <div
-								data-link="/pages/page04.html"
+								data-link="/pages/work04.html"
 								class="p-work__image" 
 								id="js-work-image" 
 								style="background-image:url(/img/giannis.avif)"
@@ -175,37 +173,33 @@
 				</div>
 				<!-- work -->
 			</section>
-			<!-- l-works -->
+			<!-- preview-wrap -->
 
 			<!-- content-wrap -->
 			<section class="l-content p-content">
-
 				<!-- 
-					⭐️page01の状態
+					⭐️work01の状態
 					⭐️この中は遷移先から取得する 
 				-->
 				<div class="p-content__inner" id="js-content-inner">
 					<div class="content__group-inner">
 						<div class="content__title">
-							<span class="oh"><span class="oh__inner">Kevin</span></span>
-							<span class="oh"><span class="oh__inner">Durant</span></span>
+							<span class="oh"><span class="oh__inner">Giannis</span></span>
+							<span class="oh"><span class="oh__inner">Antetokounmpo</span></span>
 						</div>
-						<div class="content__meta oh"><span class="oh__inner">Durant on__inner</span></div>
+						<div class="content__meta oh"><span class="oh__inner">Giannis oh__inner</span></div>
 						<div class="content__text">
-							One of the most gifted scorers in NBA history with a smooth shooting stroke.
+							A two-time MVP known for his dominance in the paint and relentless defense.
 						</div>  
 					</div> 
-			
-					<div class="content__thumbs-inner">						
-						<div class="content__thumbs-item" style="background-image:url(/img/4_1.avif)"></div>
-						<div class="content__thumbs-item" style="background-image:url(/img/4_2.avif)"></div>
-						<div class="content__thumbs-item" style="background-image:url(/img/4_3.avif)"></div>
-						<div class="content__thumbs-item" style="background-image:url(/img/4_4.avif)"></div> 
+					<div class="content__thumbs-inner">
+						<div class="content__thumbs-item" style="background-image:url(/img/3_1.avif)"></div>
+						<div class="content__thumbs-item" style="background-image:url(/img/3_2.avif)"></div>
+						<div class="content__thumbs-item" style="background-image:url(/img/3_3.avif)"></div>
+						<div class="content__thumbs-item" style="background-image:url(/img/3_4.avif)"></div> 
 					</div> 
-				
 					<div class="content__image-wrapper"></div>
 				</div>
-
 
 				<!-- 戻るボタン -->
 				<button class="unbutton action action--back">

@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async() => {
   isAnimating = true;
 
   const path = window.location.pathname === "/" ? "/" : window.location.pathname;
-  // console.log(path); // /src/pages/page01.html
+  // console.log(path); // /src/pages/work01.html
 
   await pushHistory(path); // ブラウザに履歴を残す
 
@@ -152,30 +152,19 @@ async function pushHistory(_url) { // 👉 遷移先のurlを渡す
                                                   // 第3引数 → アドレスバーのパスを_urlに変更
 }
 
-
-// ✅ パスの正規化 → ページ名のみを取得
-// function normalizePath(_pathname){
-//   // 受け取る値：
-//   // "/", "/pages/page01.html", "/pages/about.html" など。
-//   return _pathname
-//     .replace(/^\/pages/, "") // "/pages/page01.html" → "/page01.html"
-//     .replace(/\.html$/, "")  // "/page01.html" → ⭐️ "/page01" として返す
-// }
-
-
-
-
-// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
-// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️
+// ✅　ルーティング
+// → .test() ... マッチすればtrueが返る
+const ROUTES = [
+  { type: "home",  match: path => path === "/" },
+  { type: "about", match: path => /^\/pages\/about\.html$/.test(path) },
+  { type: "work",  match: path => /^\/pages\/work\d+\.html$/.test(path) }, // d+ → 数字が1文字以上続く
+];
 
 // ✅ ページ種別判定 
-// →「URL文字列で分岐しないため」、「ルーティングの“意味”を一箇所に集約するため」
 function getPageType(_path){
-  // console.log(_path); // /, /pages/page01.html, /pages/about.html
-  if(_path === "/") return "home";
-  if(_path === "/pages/about.html") return "about";
-  if(_path.startsWith("/page")) return "work";
-  return unknown;
+  // console.log(_path); // /, /pages/work01.html, /pages/about.html
+  const route = ROUTES.find(r => r.match(_path)); // _pathと見合ったオブジェクトが返される
+  return route?.type ?? "unknown";
 }
 
 // ✅ ブラウザの戻る/進むで発火。.pop 取り出す、state 状態
@@ -190,13 +179,10 @@ window.addEventListener("popstate", async (e) => {
     const path = e.state?.path || window.location.pathname || "/"; // 遷移先のパス。なければ、/
     // console.log(path);
 
-    // const normalizedPath = normalizePath(path); // 👉 パスの正規化
-    // console.log(normalizedPath); // /page01
-
     if(path === previousPath) return; // ページが変わらなければ処理終わり
 
     const pathType = getPageType(path); // 👉 ページの種別を取得
-    // console.log(pathType); // home about work
+    console.log(pathType); // home about work
     
     switch (pathType){
       // ✅　index.htmlに遷移時 
@@ -246,7 +232,7 @@ window.addEventListener("popstate", async (e) => {
 /////////////// ✅ 着地したページの内容に更新 //////////////////////////////
 // ⭐️ TODO aboutページなら、main全てを入れ替え
 async function loadPage(_url) {
-  // console.log(_url); // /, /pages/page01.html, /pages/about.html
+  // console.log(_url); // /, /pages/work01.html, /pages/about.html
 
   try {
     const html = await fetch(_url); // ページデータを取得
@@ -258,12 +244,13 @@ async function loadPage(_url) {
     // console.log(parser.parseFromString(htmlString, "text/html")); // #document { http://127.0.0.1:5500/ }
     // → HTML Documentオブジェクト を取得
     const parsedHtml = parser.parseFromString(htmlString, "text/html");
-    // console.log(parsedHtml); // 遷移先のhtmlを取得。#document (http://localhost:5173/src/pages/page01.html)
+    // console.log(parsedHtml); // 遷移先のhtmlを取得。#document (http://localhost:5173/src/pages/work01.html)
 
     renderHeadMetaData(parsedHtml); // 👉 headタグ内の更新
 
     const pageType = getPageType(_url); // 👉 各ページを更新
-    // console.log(pageType)
+    // console.log(pageType) // home, work, about
+
     switch (pageType) {
       case "home":
         renderHomePage(parsedHtml);
@@ -354,16 +341,18 @@ function renderWorkPage(_parsedHtml){
 
 // ✅　aboutページの更新
 function renderAboutPage(_parsedHtml){
-  const main = _parsedHtml.querySelector("main");
-  document.querySelector("main").innerHTML = main.innerHtml;
+  const parsedMain = _parsedHtml.querySelector("main");
+  const currentMain = document.querySelector("main");
+  if(!parsedMain || !currentMain ) return;
+
+  currentMain.innerHTML = parsedMain.innerHTML;
 }
 
 // ✅　404ページの更新
 function renderNotFoundPage(_parsedHtml){
   const main = _parsedHtml.querySelector("main");
-  document.querySelector("main").innerHTML = main.innerHtml;
+  document.querySelector("main").innerHTML = main.innerHTML;
 }
-
 
 
 // ✅ イベント関係の初期化　TODO イベント関係はすべてここにまとめる
@@ -399,7 +388,7 @@ function initEventListeners() {
     isAnimating = true;
     
     const link = e.currentTarget.dataset.link;
-    // console.log(link)
+    // console.log(link); // /pages/about.html
 
     await pushHistory(link);
 
@@ -650,6 +639,11 @@ async function hideContent(_work) {
 }
 
 
+
+// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
+// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
+// TODO aboutから戻る場合と、workから戻る場合とで条件分岐
+
 // ⭐️ 戻るボタン → どんな時もindex.htmlに戻す
 function attachBackButton() {
   const backBtn = document.querySelector(".action--back");
@@ -660,7 +654,7 @@ function attachBackButton() {
       isAnimating = true;
 
       const path = window.location.pathname;
-      // console.log(path); // /src/pages/page01.html 遷移前のurlを取得
+      // console.log(path); // /src/pages/work01.html 遷移前のurlを取得
       const targetWork = worksInstances.find((work) => work.$.link === path); 
       // console.log(targetWork);
     
