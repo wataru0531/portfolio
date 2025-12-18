@@ -49,8 +49,8 @@ let isAnimating = false;
 
 const parser = new DOMParser(); // 文字列を実際のDOMに変換するパーサー
 
-const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
-const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
+// const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
+// const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
 
 let contentInstance; // new Contentのインスタンス
 
@@ -160,7 +160,7 @@ const ROUTES = [
   { type: "work",  match: path => /^\/pages\/work\d+\.html$/.test(path) }, // d+ → 数字が1文字以上続く
 ];
 
-// ✅ ページ種別判定 
+// ✅ ページ種別判定 → home about work のどれかを返す
 function getPageType(_path){
   // console.log(_path); // /, /pages/work01.html, /pages/about.html
   const route = ROUTES.find(r => r.match(_path)); // _pathと見合ったオブジェクトが返される
@@ -225,9 +225,11 @@ window.addEventListener("popstate", async (e) => {
   } finally {
     isAnimating = false; // 必ずfalseにしておく
   }
-
 });
 
+
+// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
+// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
 
 /////////////// ✅ 着地したページの内容に更新 //////////////////////////////
 // ⭐️ TODO aboutページなら、main全てを入れ替え
@@ -248,7 +250,7 @@ async function loadPage(_url) {
 
     renderHeadMetaData(parsedHtml); // 👉 headタグ内の更新
 
-    const pageType = getPageType(_url); // 👉 各ページを更新
+    const pageType = getPageType(_url); // 👉 各ページのタイプを取得
     // console.log(pageType) // home, work, about
 
     switch (pageType) {
@@ -325,6 +327,11 @@ function renderHomePage(_parsedHtml){
   const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
   // console.log(parsedContentGroupInner);
 
+  // 遷移先のDOM
+  // const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
+  // const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
+  // console.log(contentGroupInner)
+
   contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
   contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
 }
@@ -334,6 +341,10 @@ function renderWorkPage(_parsedHtml){
   const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
   const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
   // console.log(parsedContentGroupInner);
+
+  // 遷移先のDOM
+  // const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
+  // const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
 
   contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
   contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
@@ -382,7 +393,7 @@ function initEventListeners() {
     });
   }
 
-  // 👉 aboutボタンクリック ... aboutページ遷移
+  // 👉 aboutボタンクリック時
   headerAboutBtn.addEventListener("click", async (e) => {
     if(isAnimating) return;
     isAnimating = true;
@@ -639,11 +650,6 @@ async function hideContent(_work) {
 }
 
 
-
-// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
-// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
-// TODO aboutから戻る場合と、workから戻る場合とで条件分岐
-
 // ⭐️ 戻るボタン → どんな時もindex.htmlに戻す
 function attachBackButton() {
   const backBtn = document.querySelector(".action--back");
@@ -653,18 +659,36 @@ function attachBackButton() {
       if(isAnimating) return; // アニメーション中は処理を受け付けない
       isAnimating = true;
 
-      const path = window.location.pathname;
-      // console.log(path); // /src/pages/work01.html 遷移前のurlを取得
-      const targetWork = worksInstances.find((work) => work.$.link === path); 
-      // console.log(targetWork);
-    
-      await hideContent(targetWork); // ⭐️コンテンツ非表示
+      try{
+        const path = window.location.pathname;
+        // console.log(path); // /pages/about.html
+        const pageType = getPageType(path);
 
-      await loadPage("/");
+        switch(pageType){
+          case "work": {
+            const targetWork = worksInstances.find((work) => work.$.link === path); 
+            // console.log(targetWork);
+            await hideContent(targetWork); // ⭐️コンテンツ非表示
 
-      await pushHistory("/"); // ブラウザの履歴に記録
+            await loadPage("/");
+            await pushHistory("/"); // ブラウザの履歴に記録
+            break;
+          }
 
-      isAnimating = false;
+          case "about": {
+            await loadPage("/");
+            await pushHistory("/");
+            break;
+          }
+        }
+
+
+      } catch(e){
+
+      } finally {
+        isAnimating = false;
+      }
+      
     });
   }
 }
