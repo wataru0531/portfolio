@@ -224,6 +224,24 @@
 
 			</section>
 			<!-- content-wrap -->
+
+			<!-- 
+				✅ ・l-aboutの中のDOMはaboutページから取得
+					・workページを開く時には、bodyにcontent-open　がつくので、
+						aboutページの時にも同じようにクラスを付与する
+
+					・以下のクラスを使って各コンテンツを防ぐ
+						.is-hidden {
+							opacity: 0;
+							visibility: hidden;
+							pointer-events: none;
+						}
+
+				<section class="l-about p-about">
+
+				</section> 
+			-->
+
 		</main>
 
 		<!-- footer -->

@@ -190,15 +190,6 @@ window.addEventListener("popstate", async (e) => {
     switch (pathType){
       // ✅　index.htmlに遷移時 → workページ、aboutページのどちらかから戻る処理を分岐させる
       case "home": {
-        // if(previousPath === "/about"){
-        //   restoreIndexPage(); // aboutページに戻るときは復元させる
-
-        // } else {
-        //   const targetWork = worksInstances.find((work) => work.$.link === previousPath);
-        //   await hideContent(targetWork);
-
-        //   await loadPage("/"); 
-        // }
         const targetWork = worksInstances.find((work) => work.$.link === previousPath);
         await hideContent(targetWork);
 
@@ -238,14 +229,6 @@ window.addEventListener("popstate", async (e) => {
   }
 });
 
-
-// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
-// ⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから⭐️ここから
-
-// → aboutページからindex.htmlに遷移する場合と、
-//   他のぺーじから遷移する場合とではmainの中身が違うから困難
-//   👉 index.htmlのmain以下を作り直す処理を構築する
-
 /////////////// ✅ 着地したページの内容に更新 //////////////////////////////
 // ⭐️ TODO aboutページなら、main全てを入れ替え
 async function loadPage(_url) {
@@ -270,7 +253,7 @@ async function loadPage(_url) {
 
     switch (pageType) {
       case "home":
-        renderHomePage(parsedHtml);
+        renderHomePage(parsedHtml); 
         break;
       case "work":
         renderWorkPage(parsedHtml);
@@ -337,9 +320,6 @@ function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name �
 }
 
 
-// ⭐️ここからここからここから⭐️ここからここからここから⭐️ここからここからここから⭐️ここからここからここから
-// ⭐️ここからここからここから⭐️ここからここからここから⭐️ここからここからここから⭐️ここからここからここから
-
 // ✅ トップページの更新
 function renderHomePage(_parsedHtml){
   const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
@@ -348,8 +328,6 @@ function renderHomePage(_parsedHtml){
 
   contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
   contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
-
-  // const body = document.body;
 }
 
 // ✅ 各Workページの更新
@@ -357,10 +335,6 @@ function renderWorkPage(_parsedHtml){
   const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
   const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
   // console.log(parsedContentGroupInner);
-
-  // 遷移先のDOM
-  // const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
-  // const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
 
   contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
   contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
@@ -381,6 +355,17 @@ function renderNotFoundPage(_parsedHtml){
   document.querySelector("main").innerHTML = main.innerHTML;
 }
 
+// ✅ index.pageを生成する関数
+// function renderIndexPage(){
+//   const body = document.body;
+
+//   // header、footerは固定なのでそのまま
+//   const main = document.querySelector("main");
+//   if(main) main.remove();
+
+//   body.insertAdjacentElement("beforeend", createHomeMain());
+//   // initEventListeners(); // ⭐️ index 専用イベントを再初期化
+// }
 
 // ✅ イベント関係の初期化　TODO イベント関係はすべてここにまとめる
 function initEventListeners() {
