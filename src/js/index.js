@@ -36,6 +36,8 @@ import { utils } from "./utils.js";
 import { Work } from "./work.js";
 import { Content } from "./content.js";
 
+import { createHomeMain } from "./templates/home.js";
+
 const ANIMATION_CONFIG = { duration: 1.5, ease: "power4.inOut" };
 
 const works = [...document.querySelectorAll("#js-work")];
@@ -49,13 +51,14 @@ let isAnimating = false;
 
 const parser = new DOMParser(); // 文字列を実際のDOMに変換するパーサー
 
-// const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
-// const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
+const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
+const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
 
 let contentInstance; // new Contentのインスタンス
 
 
-// Lenis初期化
+
+// ✅ Lenis初期化
 function initSmoothScrolling() {
   lenis = new Lenis();
 
@@ -69,7 +72,7 @@ function initSmoothScrolling() {
   gsap.ticker.lagSmoothing(0);
 }
 
-// 画像、タイトルのパララックスアニメーション
+// ✅ 画像、タイトルのパララックスアニメーション
 function animateOnScroll() {
   for (const previewItem of previewInstances) {
     previewItem.scrollTimeline = gsap.timeline({
@@ -182,18 +185,26 @@ window.addEventListener("popstate", async (e) => {
     if(path === previousPath) return; // ページが変わらなければ処理終わり
 
     const pathType = getPageType(path); // 👉 ページの種別を取得
-    console.log(pathType); // home about work
+    // console.log(pathType); // home about work
     
     switch (pathType){
-      // ✅　index.htmlに遷移時 
+      // ✅　index.htmlに遷移時 → workページ、aboutページのどちらかから戻る処理を分岐させる
       case "home": {
+        // if(previousPath === "/about"){
+        //   restoreIndexPage(); // aboutページに戻るときは復元させる
+
+        // } else {
+        //   const targetWork = worksInstances.find((work) => work.$.link === previousPath);
+        //   await hideContent(targetWork);
+
+        //   await loadPage("/"); 
+        // }
         const targetWork = worksInstances.find((work) => work.$.link === previousPath);
         await hideContent(targetWork);
 
-        await loadPage("/"); // 遷移先(index.html)のページをロード
-
-        previousPath = "/"; // previousPathを更新
-
+        await loadPage("/"); 
+        
+        previousPath = "/";
         break;
       }
 
@@ -325,19 +336,20 @@ function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name �
   }
 }
 
+
+// ⭐️ここからここからここから⭐️ここからここからここから⭐️ここからここからここから⭐️ここからここからここから
+// ⭐️ここからここからここから⭐️ここからここからここから⭐️ここからここからここから⭐️ここからここからここから
+
 // ✅ トップページの更新
 function renderHomePage(_parsedHtml){
   const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
   const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
   // console.log(parsedContentGroupInner);
 
-  // 遷移先のDOM
-  // const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
-  // const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
-  // console.log(contentGroupInner)
-
   contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
   contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
+
+  // const body = document.body;
 }
 
 // ✅ 各Workページの更新
