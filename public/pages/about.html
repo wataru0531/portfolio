@@ -80,9 +80,150 @@
     <!-- header -->
     
 		<main>
-      <!-- TODO mainの中をすべて遷移時に書き換える -->
-			<section class="p-about">
-        <div class="p-about__inner">
+			<!-- l-works -->
+			<section class="l-works p-works" id="js-works"> <!-- 元preview-wrap -->
+				<!-- p-work -->
+				<div class="p-work" id="js-work"> <!-- 元preview -->
+					<div class="p-work__image-inner" id="js-work-image-inner"> <!-- 元preview__img-wrap -->
+            <div class="p-work__image-wrapper" id="js-work-image-wrapper">
+							<!-- 一番下のこの要素がe.targetになる -->
+              <div
+								class="p-work__image"
+								id="js-work-image" 
+								data-link="/pages/work01.html"
+								style="background-image:url(/img/lebron.avif)"
+							> <!-- 元preview__img-inner -->
+							</div>
+            </div>
+          </div>
+
+					<div class="p-work__header" id="js-work-header"> <!-- 元preview__title -->
+						<h2 class="p-work__title"> <!-- 元preview__title-main -->
+							<span class="oh"><span class="oh__inner">LeBron</span></span>
+							<span class="oh"><span class="oh__inner">James</span></span>
+						</h2>
+						<p class="p-work__description" id="js-work-description">A four-time NBA champion known for his versatility, leadership, and basketball IQ.</p>
+						<!-- 元 p-work__desc -->
+					</div>	
+				</div>
+				<!-- p-work -->
+				
+				<!-- p-work -->
+				<div class="p-work" id="js-work">
+					<div class="p-work__image-inner" id="js-work-image-inner">
+            <div class="p-work__image-wrapper" id="js-work-image-wrapper">
+							<!-- 一番下のこの要素がe.targetになる -->
+              <div
+								data-link="/pages/work02.html"
+								class="p-work__image" 
+								id="js-work-image" 
+								style="background-image:url(/img/curry.avif)"
+							>
+							</div>
+            </div>
+          </div>
+
+					<div class="p-work__header" id="js-work-header">
+						<h2 class="p-work__title">
+							<span class="oh"><span class="oh__inner">Stephen</span></span>
+							<span class="oh"><span class="oh__inner">Curry</span></span>
+						</h2>
+						<p class="p-work__description" id="js-work-description">Revolutionized the game with his deep three-point shooting and quick release.</p>
+					</div>
+				</div>
+				<!-- p-work -->
+
+				<!-- p-work -->
+				<div class="p-work" id="js-work">
+					<div class="p-work__image-inner" id="js-work-image-inner">
+            <div class="p-work__image-wrapper" id="js-work-image-wrapper">
+							<!-- 一番下のこの要素がe.targetになる -->
+              <div
+								data-link="/pages/work03.html"
+								class="p-work__image" 
+								id="js-work-image" 
+								style="background-image:url(/img/durant.avif)"
+							>
+							</div>
+            </div>
+          </div>
+
+					<div class="p-work__header" id="js-work-header">
+						<h2 class="p-work__title">
+							<span class="oh"><span class="oh__inner">Kevin</span></span>
+							<span class="oh"><span class="oh__inner">Durant</span></span>
+						</h2>
+						<p class="p-work__description" id="js-work-description">A two-time MVP known for his dominance in the paint and relentless defense.</p>
+					</div>
+				</div>
+				<!-- p-work -->
+
+				<!-- p-work -->
+				<div class="p-work" id="js-work">
+					<div class="p-work__image-inner" id="js-work-image-inner">
+            <div class="p-work__image-wrapper" id="js-work-image-wrapper">
+							<!-- 一番下のこの要素がe.targetになる -->
+              <div
+								data-link="/pages/work04.html"
+								class="p-work__image" 
+								id="js-work-image" 
+								style="background-image:url(/img/giannis.avif)"
+							>
+							</div>
+            </div>
+          </div>
+
+					<div class="p-work__header" id="js-work-header">
+						<h2 class="p-work__title">
+							<span class="oh"><span class="oh__inner">Giannis</span></span>
+							<span class="oh"><span class="oh__inner">Antetokounmpo</span></span>
+						</h2>
+						<p class="p-work__description" id="js-work-description">One of the most gifted scorers in NBA history with a smooth shooting stroke.</p>
+					</div>
+				</div>
+				<!-- work -->
+				
+			</section>
+			<!-- l-works -->
+
+			<!-- l-contents -->
+			<section class="l-content p-content">
+				<div class="p-content__inner" id="js-content-inner">
+					<div class="content__group-inner">
+						<!-- 
+							<div class="content__title">
+								<span class="oh"><span class="oh__inner">Andesite</span></span>
+								<span class="oh"><span class="oh__inner">aphanitic</span></span>
+							</div>
+							<div class="content__meta oh"><span class="oh__inner">By James Maurice Rojo</span></div>
+							<div class="content__text">
+								Andesite (/ˈændəzaɪt/) is a volcanic rock of intermediate composition. In a general sense, it is the intermediate type between silica-poor basalt and silica-rich rhyolite. 
+							</div>  
+						-->
+					</div> 
+					
+					<div class="content__thumbs-inner">
+						<!--
+							<div class="content__thumbs-item" style="background-image:url(img/1_1.avif)"></div>
+							<div class="content__thumbs-item" style="background-image:url(img/1_2.avif)"></div>
+							<div class="content__thumbs-item" style="background-image:url(img/1_3.avif)"></div>
+							<div class="content__thumbs-item" style="background-image:url(img/1_4.avif)"></div> 
+						-->
+					</div> 
+					<div class="content__image-wrapper"></div>
+
+					<!-- 戻るボタン -->
+					<button class="unbutton action action--back">
+						<svg width="25px" height="25px" viewBox="0 0 25 25"><path d="M24 12.001H2.914l5.294-5.295-.707-.707L1 12.501l6.5 6.5.707-.707-5.293-5.293H24v-1z"/></svg>
+						<span>Go back</span>
+					</button>
+			</section>
+			<!-- l-contents -->
+
+
+      <!-- l-about -->
+			<section class="l-about p-about">
+        <div class="p-about__inner" id="js-about-inner">
 					<div class="p-about__header">
 						<div class="p-about__title">
 							<h1>Aboutページ</h1>
@@ -92,27 +233,29 @@
 					<div class="p-about__discription">
 						このページは私について記述します.
 					</div>
-				</div>
-				<div class="p-about__contents">
-					<figure class="p-about__img">
-						<img src="/img/wataru.avif" alt="">
-					</figure>
-					<div class="p-about__profiles">
-						<div class="p-about__profile p-profile">
-							<div class="p-profile__title">profile</div>
-							<div class="p-profile__congents">
-								<p class="p-profile__hobby">趣味：絵画(色鉛筆)、筋トレ、銭湯・サウナ</p>
+				
+					<div class="p-about__contents">
+						<figure class="p-about__img">
+							<img src="/img/wataru.avif" alt="">
+						</figure>
+						<div class="p-about__profiles">
+							<div class="p-about__profile p-profile">
+								<div class="p-profile__title">profile</div>
+								<div class="p-profile__congents">
+									<p class="p-profile__hobby">趣味：絵画(色鉛筆)、筋トレ、銭湯・サウナ</p>
+								</div>
 							</div>
-						</div>
-						<div class="p-about__skill p-skill">
-							<div class="p-skill__title">skill</div>
-							<div class="p-skill__skills">
-								HTML / CSS / Sass(SCSS) / JavaScript / WordPress / EJS / gulp / webpack / React / Next.js / WebGL
+							<div class="p-about__skill p-skill">
+								<div class="p-skill__title">skill</div>
+								<div class="p-skill__skills">
+									HTML / CSS / Sass(SCSS) / JavaScript / WordPress / EJS / gulp / webpack / React / Next.js / WebGL
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>	
       </section>
+			<!-- l-about -->
 
 		</main>
 

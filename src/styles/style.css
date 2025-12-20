@@ -64,10 +64,17 @@ body {
   display: none;
 }
 
+/* ✅ コンテント部分 オープン */
 .content-open {
 	overflow: hidden;
 	height: 100vh;
 }
+
+.about-open{
+	overflow: hidden;
+	height: 100vh;
+}
+
 
 .oh {
     position: relative;
@@ -320,10 +327,6 @@ main {
 .p-content {
 	padding: 2rem;
 	width: 100%;
-
-	grid-area: page;
-	/* height: 100vh; */
-	/* overflow: hidden; */
 	display: grid;
 	grid-template-areas: 
 	'back back'
@@ -458,6 +461,38 @@ main {
 .content__thumbs-item:hover {
 	cursor: not-allowed;
 }
+
+/* ⭐️ aboutページ */
+.l-about{
+
+}
+
+.p-about{
+	padding: 2rem;
+	width: 100%;
+	display: grid;
+	grid-template-areas:
+			'back back'
+			'content content';
+	grid-template-rows: auto 1fr;
+	pointer-events: none;
+	position: fixed;
+	top: 0;
+}
+
+.p-about__inner {
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	height: 100%;
+
+	opacity: 0;
+}
+
+
+
+
 
 .hidden {
 	opacity: 0;

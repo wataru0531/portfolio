@@ -74,6 +74,11 @@
     </header>
 		<!-- header -->
 
+		<!-- 
+			⭐️ TODO
+				・sectionはページによって非表示にする。opacity、visibility、pointerevents
+				・h1, h2, h3タグは、hidden を使う
+		-->
 		<main>
 			<!-- l-works -->
 			<section class="l-works p-works" id="js-works"> <!-- 元preview-wrap -->
@@ -222,7 +227,7 @@
 				</button>
 
 			</section>
-			<!-- content-wrap -->
+			<!-- l-contents -->
 
 			<!-- 
 				✅ ・l-aboutの中のDOMはaboutページから取得
@@ -235,11 +240,13 @@
 							visibility: hidden;
 							pointer-events: none;
 						}
-
-				<section class="l-about p-about">
-
-				</section> 
 			-->
+			<section class="l-about p-about">
+				<div class="p-about__inner" id="js-about-inner">
+					<!-- aboutページに遷移語にDOMを差し込む -->
+				</div>
+			</section> 
+			<!-- l-about -->
 
 		</main>
 

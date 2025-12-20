@@ -1,6 +1,5 @@
 // TODO
 
-
 // ⭐️ここから
 // htmlのクラス名の修正、わかりやすくする
 // CSSを変更
@@ -33,10 +32,11 @@ gsap.registerPlugin(Flip);
 
 import { utils } from "./utils.js";
 // import { INode } from "./INode.js";
-import { Work } from "./work.js";
-import { Content } from "./content.js";
+import { Work } from "./components/work.js";
+import { Content } from "./components/content.js";
+import { About } from "./components/about.js";
 
-import { createHomeMain } from "./templates/home.js";
+// import { createHomeMain } from "./templates/home.js";
 
 const ANIMATION_CONFIG = { duration: 1.5, ease: "power4.inOut" };
 
@@ -51,11 +51,15 @@ let isAnimating = false;
 
 const parser = new DOMParser(); // 文字列を実際のDOMに変換するパーサー
 
+// 
 const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
 const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
 
 let contentInstance; // new Contentのインスタンス
 
+// 
+const aboutInner = document.getElementById("js-about-inner");
+let aboutInstance; // new Aboutのインスタンス
 
 
 // ✅ Lenis初期化
@@ -75,25 +79,34 @@ function initSmoothScrolling() {
 // ✅ 画像、タイトルのパララックスアニメーション
 function animateOnScroll() {
   for (const previewItem of previewInstances) {
-    previewItem.scrollTimeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: previewItem.$.el,
-        start: "top bottom", // .preview ブラウザ
-        end: "bottom top",
-        scrub: true, // スクロールの進捗と、アニメーションを同期
-      },
-    }).addLabel("start", 0) // ⭐️tlの先頭から0秒地点。後のtoは同時に実行される
-    .to(previewItem.$.title,{
-        ease: "none",
-        yPercent: -100, // start から　end　にかけて-100%にする
-      }, "start")
-    .to(previewItem.$.imageInner, {
-        ease: "none",
-        scaleY: 1.8,
-      }, "start");
+    previewItem.scrollTimeline = gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: previewItem.$.el,
+          start: "top bottom", // .preview ブラウザ
+          end: "bottom top",
+          scrub: true, // スクロールの進捗と、アニメーションを同期
+        },
+      })
+      .addLabel("start", 0) // ⭐️tlの先頭から0秒地点。後のtoは同時に実行される
+      .to(
+        previewItem.$.title,
+        {
+          ease: "none",
+          yPercent: -100, // start から　end　にかけて-100%にする
+        },
+        "start"
+      )
+      .to(
+        previewItem.$.imageInner,
+        {
+          ease: "none",
+          scaleY: 1.8,
+        },
+        "start"
+      );
   }
 }
-
 
 // .workの初期化
 const worksInstances = [];
@@ -102,13 +115,13 @@ works.forEach((work, idx) => {
   worksInstances.push(new Work(work));
 });
 
-
 // ✅ 初期化処理
 document.addEventListener("DOMContentLoaded", async () => {
-  if(isAnimating) return; // アニメーション中は処理を受け付けない
+  if (isAnimating) return; // アニメーション中は処理を受け付けない
   isAnimating = true;
 
-  const path = window.location.pathname === "/" ? "/" : window.location.pathname;
+  const path =
+    window.location.pathname === "/" ? "/" : window.location.pathname;
   // console.log(path); // /src/pages/work01.html
 
   await pushHistory(path); // ブラウザに履歴を残す
@@ -121,18 +134,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   initEventListeners(); // イベント関係の初期化。showContentなど
 
   // index.html以外に着地した時は、コンテンツを表示した状態にする
-  if(path !== "/") {
+  if (path !== "/") {
     const targetWork = worksInstances.find((work) => work.$.link === path); // urlが一致するworkを取得
     // console.log(targetWork)
 
-		if(targetWork){
-			await showContent(targetWork, false); // アニメーションはさせnai
-		}
+    if (targetWork) {
+      await showContent(targetWork, false); // アニメーションはさせnai
+    }
   }
 
   isAnimating = false;
 });
-
 
 // ✅ 遷移前のurlとして持つ
 let previousPath = window.location.pathname; // 現在表示中のパス
@@ -144,29 +156,30 @@ let previousPath = window.location.pathname; // 現在表示中のパス
 // ✅state: 遷移先のページに渡したい、保持したいデータを渡す。⭐️popstateのイベントオブジェクトで取得できる
 // ✅title: ページのタイトル
 // ✅url: 遷移先のページのパスを渡す
-async function pushHistory(_url) { // 👉 遷移先のurlを渡す
+async function pushHistory(_url) {
+  // 👉 遷移先のurlを渡す
   // console.log(_url)
 
   previousPath = _url; // 👉 遷移前のurlとして更新 →　pushStateに渡す。
   // console.log(previousPath);
 
   history.pushState({ path: _url }, "", _url); // 👉 popstateでeventに渡せる
-                                                  // 第2引数 → headタブ内のtitleを変更(現在は意味がない)
-                                                  // 第3引数 → アドレスバーのパスを_urlに変更
+  // 第2引数 → headタブ内のtitleを変更(現在は意味がない)
+  // 第3引数 → アドレスバーのパスを_urlに変更
 }
 
 // ✅　ルーティング
 // → .test() ... マッチすればtrueが返る
 const ROUTES = [
-  { type: "home",  match: path => path === "/" },
-  { type: "about", match: path => /^\/pages\/about\.html$/.test(path) },
-  { type: "work",  match: path => /^\/pages\/work\d+\.html$/.test(path) }, // d+ → 数字が1文字以上続く
+  { type: "home", match: (path) => path === "/" },
+  { type: "about", match: (path) => /^\/pages\/about\.html$/.test(path) },
+  { type: "work", match: (path) => /^\/pages\/work\d+\.html$/.test(path) }, // d+ → 数字が1文字以上続く
 ];
 
 // ✅ ページ種別判定 → home about work のどれかを返す
-function getPageType(_path){
+function getPageType(_path) {
   // console.log(_path); // /, /pages/work01.html, /pages/about.html
-  const route = ROUTES.find(r => r.match(_path)); // _pathと見合ったオブジェクトが返される
+  const route = ROUTES.find((r) => r.match(_path)); // _pathと見合ったオブジェクトが返される
   return route?.type ?? "unknown";
 }
 
@@ -175,28 +188,30 @@ function getPageType(_path){
 // 👉 TODO ... aboutページ追加した時の挙動もプラス
 window.addEventListener("popstate", async (e) => {
   // console.log(e.state.path) → pushStateの時に渡したオブジェクトのデータを取得できる
-  if(isAnimating) return; 
+  if (isAnimating) return;
   isAnimating = true;
 
-  try{
+  try {
     const path = e.state?.path || window.location.pathname || "/"; // 遷移先のパス。なければ、/
     // console.log(path);
 
-    if(path === previousPath) return; // ページが変わらなければ処理終わり
+    if (path === previousPath) return; // ページが変わらなければ処理終わり
 
     const pathType = getPageType(path); // 👉 ページの種別を取得
     // console.log(pathType); // home about work
-    
-    switch (pathType){
+
+    switch (pathType) {
       // ✅ workページ → index.htmlに遷移時
-      //    aboutページ → index.htmlに遷移時 
+      //    aboutページ → index.htmlに遷移時
       //    → 処理を分岐させる
       case "home": {
-        const targetWork = worksInstances.find((work) => work.$.link === previousPath);
+        const targetWork = worksInstances.find(
+          (work) => work.$.link === previousPath
+        );
         await hideContent(targetWork);
 
-        await loadPage("/"); 
-        
+        await loadPage("/");
+
         previousPath = "/";
         break;
       }
@@ -211,7 +226,7 @@ window.addEventListener("popstate", async (e) => {
 
         previousPath = url;
 
-        break
+        break;
       }
 
       // ✅ aboutページ遷移時
@@ -220,17 +235,16 @@ window.addEventListener("popstate", async (e) => {
 
         previousPath = "/about";
 
-        break
+        break;
       }
 
-      default: console.warn("Unknown route: ", path)
+      default:
+        console.warn("Unknown route: ", path);
     }
-
   } finally {
     isAnimating = false; // 必ずfalseにしておく
   }
 });
-
 
 // ✅ 着地したページの内容に更新する
 // ⭐️ TODO aboutページなら、main全てを入れ替え
@@ -256,7 +270,7 @@ async function loadPage(_url) {
 
     switch (pageType) {
       case "home":
-        renderHomePage(parsedHtml); 
+        renderHomePage(parsedHtml);
         break;
       case "work":
         renderWorkPage(parsedHtml);
@@ -264,55 +278,62 @@ async function loadPage(_url) {
       case "about":
         renderAboutPage(parsedHtml);
         break;
-      
+
       default:
         renderNotFoundPage();
     }
-    
   } catch (error) {
     console.error("[LoadPage error]", error);
     renderNotFoundPage();
   }
 }
 
-
-// ヘッダタグ内の更新
-function renderHeadMetaData(_parsedHtml){
+// ✅ ヘッド内の更新
+function renderHeadMetaData(_parsedHtml) {
   // console.log(_parsedHtml)
   const parsedTitle = _parsedHtml.querySelector("title"); // ⭐️ headタグ内の更新をしていく
-    // console.log(parsedTitle)
-		if(parsedTitle) document.title = parsedTitle.textContent;
+  // console.log(parsedTitle)
+  if (parsedTitle) document.title = parsedTitle.textContent;
 
-		// ✅ metaタグ内の更新
-		[..._parsedHtml.head.querySelectorAll("meta")].forEach(meta => {
-			// console.log(meta);
+  // ✅ metaタグ内の更新
+  [..._parsedHtml.head.querySelectorAll("meta")].forEach((meta) => {
+    // console.log(meta);
 
-			const name = meta.getAttribute("name"); // 👉 これら3つは更新しない。
-			const httpEquiv = meta.getAttribute("http-equiv");
-			const charset = meta.getAttribute("charset");
-      // console.log(name, httpEquiv, charset)
-			if(charset !== null || httpEquiv !== null || (name === "viewport")) return;
+    const name = meta.getAttribute("name"); // 👉 これら3つは更新しない。
+    const httpEquiv = meta.getAttribute("http-equiv");
+    const charset = meta.getAttribute("charset");
+    // console.log(name, httpEquiv, charset)
+    if (charset !== null || httpEquiv !== null || name === "viewport") return;
 
-			if(meta.hasAttribute("name")) { // nameの場合の処理
-				updateMetaTagByAttr("name", meta.getAttribute("name"), meta.getAttribute("content"));
-
-			} else if (meta.hasAttribute("property")) { // propertyの場合の処理
-				// console.log("property"); // OGP
-				updateMetaTagByAttr("property", meta.getAttribute("property"), meta.getAttribute("content"));
-			}
-		});
-
+    if (meta.hasAttribute("name")) {
+      // nameの場合の処理
+      updateMetaTagByAttr(
+        "name",
+        meta.getAttribute("name"),
+        meta.getAttribute("content")
+      );
+    } else if (meta.hasAttribute("property")) {
+      // propertyの場合の処理
+      // console.log("property"); // OGP
+      updateMetaTagByAttr(
+        "property",
+        meta.getAttribute("property"),
+        meta.getAttribute("content")
+      );
+    }
+  });
 }
 
-
 // ✅ headタグ内のmetaデータを更新(上書き)
-function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name か content)
-  let selector = _attr === "name" ? `meta[name="${_name}"]` : `meta[property="${_name}"]`;
+function updateMetaTagByAttr(_attr, _name, _content) {
+  // attr → 属性(name か content)
+  let selector =
+    _attr === "name" ? `meta[name="${_name}"]` : `meta[property="${_name}"]`;
   // console.log(selector);
   let tag = document.head.querySelector(selector);
-	// console.log(tag);
+  // console.log(tag);
 
-  if(tag) {
+  if (tag) {
     tag.setAttribute("content", _content); // ⭐️上書きして更新
   } else {
     tag = document.createElement("meta"); // ⭐️ tagがなければここで生成して挿入する
@@ -322,25 +343,24 @@ function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name �
   }
 }
 
-
 // ✅ トップページの更新
-function renderHomePage(_parsedHtml){
+function renderHomePage(_parsedHtml) {
   // console.log(_parsedHtml); // → index.htmlの内容は全て取得
 
   // 元のコード
   // console.log(_parsedHtml.querySelector(".content__group-inner")); // 中は空。
-  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");   // 空を入れる
+  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner"); // 空を入れる
   const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner"); // 空を入れる
 
   // console.log(parsedContentGroupInner.innerHTML)
   // console.log(contentGroupInner); // null → ⭐️ これがエラーの原因
-  contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML; 
+  contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
   contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
 }
 
 // ✅ 各Workページの更新
-function renderWorkPage(_parsedHtml){
-  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner"); 
+function renderWorkPage(_parsedHtml) {
+  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
   const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
   // console.log(parsedContentGroupInner);
 
@@ -349,17 +369,15 @@ function renderWorkPage(_parsedHtml){
 }
 
 // ✅　aboutページの更新
-function renderAboutPage(_parsedHtml){
+function renderAboutPage(_parsedHtml) {
   // console.log(_parsedHtml);
-  const parsedMain = _parsedHtml.querySelector("main");
-  const currentMain = document.querySelector("main");
-  if(!parsedMain || !currentMain ) return;
+  const parsedMain = _parsedHtml.querySelector("#js-about-inner");
 
-  currentMain.innerHTML = parsedMain.innerHTML;
+  aboutInner.innerHTML = parsedMain.innerHTML
 }
 
 // ✅　404ページの更新
-function renderNotFoundPage(_parsedHtml){
+function renderNotFoundPage(_parsedHtml) {
   const main = _parsedHtml.querySelector("main");
   document.querySelector("main").innerHTML = main.innerHTML;
 }
@@ -369,9 +387,9 @@ function initEventListeners() {
   // console.log(worksInstances.entries());
 
   // 👉　各Workクリック時
-  for(const [ idx, work ] of worksInstances.entries()) {
+  for (const [idx, work] of worksInstances.entries()) {
     work.$.imageInner.addEventListener("click", async (event) => {
-      if(isAnimating) return; // アニメーション中は処理を受け付けない
+      if (isAnimating) return; // アニメーション中は処理を受け付けない
       isAnimating = true;
 
       currentWorkIdx = idx;
@@ -384,7 +402,7 @@ function initEventListeners() {
       await pushHistory(workPath); // urlの更新、履歴に追加
 
       await loadPage(workPath); // ページ読み込み
-      
+
       await showContent(work); // ⭐️コンテンツ表示
 
       isAnimating = false;
@@ -393,9 +411,9 @@ function initEventListeners() {
 
   // 👉 aboutボタンクリック時
   headerAboutBtn.addEventListener("click", async (e) => {
-    if(isAnimating) return;
+    if (isAnimating) return;
     isAnimating = true;
-    
+
     const link = e.currentTarget.dataset.link;
     // console.log(link); // /pages/about.html
 
@@ -404,7 +422,7 @@ function initEventListeners() {
     await loadPage(link);
 
     isAnimating = false;
-  })
+  });
 
   attachBackButton(); // 戻るボタンの初期化
 }
@@ -415,7 +433,8 @@ function getAdjacentItems(_work) {
 
   for (const [idx, work] of worksInstances.entries()) {
     // _work != work → 現在の_work以外を次の判定に
-    if (_work != work && utils.isInViewport(work.$.el)) { // ビューポート内に入っているかどうka
+    if (_work != work && utils.isInViewport(work.$.el)) {
+      // ビューポート内に入っているかどうka
       array.push({ idx: idx, work: work });
     }
   }
@@ -423,9 +442,9 @@ function getAdjacentItems(_work) {
   return array;
 }
 
-
 // ✅ コンテンツを表示
-async function showContent(_work, isAnimate = true) { // index.html以外はアニメーションさせない
+async function showContent(_work, isAnimate = true) {
+  // index.html以外はアニメーションさせない
   // console.log(_work); // Work {$: {…}}
   lenis.stop();
 
@@ -459,14 +478,16 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
 
   // ⭐️ TODO
   const scaleY =
-    _work.$.imageInner.getBoundingClientRect().height / _work.$.imageInner.offsetHeight;
-    // console.log(scaleY);
+    _work.$.imageInner.getBoundingClientRect().height /
+    _work.$.imageInner.offsetHeight;
+  // console.log(scaleY);
   _work.imageInnerScaleYCached = scaleY;
 
   const flipstate = Flip.getState(_work.$.image);
   contentInstance.$.contentImageWrapper.appendChild(_work.$.image);
 
-  await Promise.all([ // 👉 実際にPromiseオブジェクトを返しているのは、new Promiseのみ。gsap.toは解決済みとなる。
+  await Promise.all([
+    // 👉 実際にPromiseオブジェクトを返しているのは、new Promiseのみ。gsap.toは解決済みとなる。
     new Promise((resolve) => {
       Flip.from(flipstate, {
         duration: config.duration,
@@ -483,7 +504,7 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
     gsap.to(_work.$.titleInner, {
       yPercent: 101,
       opacity: 0,
-      stagger: - 0.03,
+      stagger: -0.03,
       ...config,
     }),
 
@@ -500,7 +521,7 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
 
     ..._work.adjacentWorks.map((el) =>
       gsap.to(el.work.$.el, {
-        y: el.idx < workIndex ? - window.innerHeight : window.innerHeight,
+        y: el.idx < workIndex ? -window.innerHeight : window.innerHeight,
         ...config,
       })
     ),
@@ -515,7 +536,7 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
     gsap.to(contentInstance.$.titleInner, {
       yPercent: 0,
       opacity: 1,
-      stagger: - 0.05,
+      stagger: -0.05,
       delay: isAnimate ? 0.15 : 0,
       ...config,
     }),
@@ -536,14 +557,15 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
     }),
 
     new Promise((resolve) => {
-      if (!isAnimate) { // アニメーションさせたいくないとき
-        setTimeout(() =>{
+      if (!isAnimate) {
+        // アニメーションさせたいくないとき
+        setTimeout(() => {
           contentInstance.multiLine.in(isAnimate);
           gsap.set(contentInstance.$.text, {
             opacity: 1,
             onComplete: resolve,
           });
-        }, 0)
+        }, 0);
       } else {
         // アニメーションさせたい時
 
@@ -552,28 +574,26 @@ async function showContent(_work, isAnimate = true) { // index.html以外はア�
 
           gsap.set(contentInstance.$.text, {
             opacity: 1,
-            duration: .3,
+            duration: 0.3,
             onComplete: resolve,
           });
-        }, 150)
-
+        }, 150);
       }
     }),
   ]);
-
 }
 
-
-// コンテンツを非表示する
+// ✅ コンテンツを非表示
 async function hideContent(_work) {
   // console.log(_work);
-  
+
   const flipstate = Flip.getState(_work.$.image); // FLIPの現状を記録
-  _work.$.imageWrapper.appendChild(_work.$.image);  // FLIPの移動先(motonoichi)を記録
+  _work.$.imageWrapper.appendChild(_work.$.image); // FLIPの移動先(motonoichi)を記録
 
   contentInstance.multiLine.out(); // 下部のテキストアニメーション。TODO 非同期に
 
-  await Promise.all([ // 全て並列で実行
+  await Promise.all([
+    // 全て並列で実行
     gsap.to(backBtn, {
       opacity: 0,
       ...ANIMATION_CONFIG,
@@ -599,11 +619,14 @@ async function hideContent(_work) {
       ...ANIMATION_CONFIG,
     }),
 
-    gsap.to(_work.adjacentWorks.map((el) => el.work.$.el), {
-      y: 0, // ずらしたアイテムを元に戻す
-      delay: 0.15,
-      ...ANIMATION_CONFIG,
-    }),
+    gsap.to(
+      _work.adjacentWorks.map((el) => el.work.$.el),
+      {
+        y: 0, // ずらしたアイテムを元に戻す
+        delay: 0.15,
+        ...ANIMATION_CONFIG,
+      }
+    ),
 
     gsap.to(_work.$.titleInner, {
       yPercent: 0,
@@ -644,27 +667,179 @@ async function hideContent(_work) {
   ]).then(() => {
     lenis.start();
     document.body.classList.remove("content-open");
-  })
+  });
 }
 
+
+// ✅ aboutページを表示
+async function showAboutPage(_about, isAnimate = true) {
+   // index.html以外はアニメーションさせない
+  // console.log(_work); // Work {$: {…}}
+  lenis.stop();
+
+  // ページに応じたアニメーション設定
+  const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
+
+  // const workIndex = worksInstances.indexOf(_work);
+  // console.log(workIndex)
+  // const adjacentWorks = getAdjacentItems(_work);
+  // _work.adjacentWorks = adjacentWorks;
+
+  const aboutInner = document.querySelector("#js-about-inner");
+  // console.log(aboutInner)
+
+  aboutInstance = new About(aboutInner); // ⭐️ Content初期化
+
+  document.body.classList.add("about-open");
+
+  // ⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから
+  // ⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから
+  // ⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから
+  // → about-open でのCSS変更から
+
+  gsap.set([contentInstance.$.titleInner, contentInstance.$.metaInner], {
+    yPercent: -101,
+    opacity: 0,
+  });
+  gsap.set(contentInstance.$.thumbs, {
+    transformOrigin: "0% 0%",
+    scale: 0,
+    yPercent: 150,
+  });
+  gsap.set([contentInstance.$.text, backBtn], {
+    opacity: 0,
+  });
+
+  // ⭐️ TODO
+  const scaleY =
+    _work.$.imageInner.getBoundingClientRect().height /
+    _work.$.imageInner.offsetHeight;
+  // console.log(scaleY);
+  _work.imageInnerScaleYCached = scaleY;
+
+  const flipstate = Flip.getState(_work.$.image);
+  contentInstance.$.contentImageWrapper.appendChild(_work.$.image);
+
+  await Promise.all([
+    // 👉 実際にPromiseオブジェクトを返しているのは、new Promiseのみ。gsap.toは解決済みとなる。
+    new Promise((resolve) => {
+      Flip.from(flipstate, {
+        duration: config.duration,
+        ease: config.ease,
+        absolute: true,
+        force3D: true,
+        onUpdate() {
+          const progress = this.progress();
+        },
+        onComplete: resolve,
+      });
+    }),
+
+    gsap.to(_work.$.titleInner, {
+      yPercent: 101,
+      opacity: 0,
+      stagger: -0.03,
+      ...config,
+    }),
+
+    gsap.to(_work.$.description, {
+      yPercent: 101,
+      opacity: 0,
+      ...config,
+    }),
+
+    gsap.to(_work.$.imageInner, {
+      scaleY: 1,
+      ...config,
+    }),
+
+    ..._work.adjacentWorks.map((el) =>
+      gsap.to(el.work.$.el, {
+        y: el.idx < workIndex ? -window.innerHeight : window.innerHeight,
+        ...config,
+      })
+    ),
+
+    gsap.to(backBtn, {
+      opacity: 1,
+      delay: isAnimate ? 0.15 : 0,
+      ...config,
+    }),
+
+    // コンテンツ関連
+    gsap.to(contentInstance.$.titleInner, {
+      yPercent: 0,
+      opacity: 1,
+      stagger: -0.05,
+      delay: isAnimate ? 0.15 : 0,
+      ...config,
+    }),
+
+    gsap.to(contentInstance.$.metaInner, {
+      yPercent: 0,
+      opacity: 1,
+      delay: isAnimate ? 0.15 : 0,
+      ...config,
+    }),
+
+    gsap.to(contentInstance.$.thumbs, {
+      scale: 1,
+      yPercent: 0,
+      stagger: -0.05,
+      delay: isAnimate ? 0.15 : 0,
+      ...config,
+    }),
+
+    new Promise((resolve) => {
+      if (!isAnimate) {
+        // アニメーションさせたいくないとき
+        setTimeout(() => {
+          contentInstance.multiLine.in(isAnimate);
+          gsap.set(contentInstance.$.text, {
+            opacity: 1,
+            onComplete: resolve,
+          });
+        }, 0);
+      } else {
+        // アニメーションさせたい時
+
+        setTimeout(() => {
+          contentInstance.multiLine.in(isAnimate); // ライン
+
+          gsap.set(contentInstance.$.text, {
+            opacity: 1,
+            duration: 0.3,
+            onComplete: resolve,
+          });
+        }, 150);
+      }
+    }),
+  ]);
+}
+
+// ✅ aboutページを非表示
+async function hideAboutPage(_about, isAnimate = true) {}
 
 // ⭐️ 戻るボタン → どんな時もindex.htmlに戻す
 function attachBackButton() {
   const backBtn = document.querySelector(".action--back");
 
-  if(backBtn) {
+  if (backBtn) {
     backBtn.addEventListener("click", async () => {
-      if(isAnimating) return; // アニメーション中は処理を受け付けない
+      if (isAnimating) return; // アニメーション中は処理を受け付けない
       isAnimating = true;
 
-      try{
+      try {
         const path = window.location.pathname;
         // console.log(path); // /pages/about.html
         const pageType = getPageType(path);
 
-        switch(pageType){
-          case "work": { // workページ → index.htmlに遷移の場合
-            const targetWork = worksInstances.find((work) => work.$.link === path); 
+        switch (pageType) {
+          case "work": {
+            // workページ → index.htmlに遷移の場合
+            const targetWork = worksInstances.find(
+              (work) => work.$.link === path
+            );
             // console.log(targetWork);
             await hideContent(targetWork); // ⭐️コンテンツ非表示
 
@@ -673,7 +848,8 @@ function attachBackButton() {
             break;
           }
 
-          case "about": { // aboutページ → index.htmlに遷移の場合
+          case "about": {
+            // aboutページ → index.htmlに遷移の場合
             // 何かのアニメーション追加
 
             await loadPage("/");
@@ -681,10 +857,7 @@ function attachBackButton() {
             break;
           }
         }
-
-
-      } catch(e){
-
+      } catch (e) {
       } finally {
         isAnimating = false;
       }
