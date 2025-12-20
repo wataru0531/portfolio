@@ -104,7 +104,7 @@ works.forEach((work, idx) => {
 
 
 // ✅ 初期化処理
-document.addEventListener("DOMContentLoaded", async() => {
+document.addEventListener("DOMContentLoaded", async () => {
   if(isAnimating) return; // アニメーション中は処理を受け付けない
   isAnimating = true;
 
@@ -188,7 +188,9 @@ window.addEventListener("popstate", async (e) => {
     // console.log(pathType); // home about work
     
     switch (pathType){
-      // ✅　index.htmlに遷移時 → workページ、aboutページのどちらかから戻る処理を分岐させる
+      // ✅ workページ → index.htmlに遷移時
+      //    aboutページ → index.htmlに遷移時 
+      //    → 処理を分岐させる
       case "home": {
         const targetWork = worksInstances.find((work) => work.$.link === previousPath);
         await hideContent(targetWork);
@@ -229,7 +231,8 @@ window.addEventListener("popstate", async (e) => {
   }
 });
 
-/////////////// ✅ 着地したページの内容に更新 //////////////////////////////
+
+// ✅ 着地したページの内容に更新する
 // ⭐️ TODO aboutページなら、main全てを入れ替え
 async function loadPage(_url) {
   // console.log(_url); // /, /pages/work01.html, /pages/about.html
@@ -322,17 +325,22 @@ function updateMetaTagByAttr(_attr, _name, _content) { // attr → 属性(name �
 
 // ✅ トップページの更新
 function renderHomePage(_parsedHtml){
-  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
-  const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
-  // console.log(parsedContentGroupInner);
+  // console.log(_parsedHtml); // → index.htmlの内容は全て取得
 
-  contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML;
+  // 元のコード
+  // console.log(_parsedHtml.querySelector(".content__group-inner")); // 中は空。
+  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");   // 空を入れる
+  const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner"); // 空を入れる
+
+  // console.log(parsedContentGroupInner.innerHTML)
+  // console.log(contentGroupInner); // null → ⭐️ これがエラーの原因
+  contentGroupInner.innerHTML = parsedContentGroupInner.innerHTML; 
   contentThumbsInner.innerHTML = parsedContentThumbsInner.innerHTML;
 }
 
 // ✅ 各Workページの更新
 function renderWorkPage(_parsedHtml){
-  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner");
+  const parsedContentGroupInner = _parsedHtml.querySelector(".content__group-inner"); 
   const parsedContentThumbsInner = _parsedHtml.querySelector(".content__thumbs-inner");
   // console.log(parsedContentGroupInner);
 
@@ -342,6 +350,7 @@ function renderWorkPage(_parsedHtml){
 
 // ✅　aboutページの更新
 function renderAboutPage(_parsedHtml){
+  // console.log(_parsedHtml);
   const parsedMain = _parsedHtml.querySelector("main");
   const currentMain = document.querySelector("main");
   if(!parsedMain || !currentMain ) return;
@@ -354,18 +363,6 @@ function renderNotFoundPage(_parsedHtml){
   const main = _parsedHtml.querySelector("main");
   document.querySelector("main").innerHTML = main.innerHTML;
 }
-
-// ✅ index.pageを生成する関数
-// function renderIndexPage(){
-//   const body = document.body;
-
-//   // header、footerは固定なのでそのまま
-//   const main = document.querySelector("main");
-//   if(main) main.remove();
-
-//   body.insertAdjacentElement("beforeend", createHomeMain());
-//   // initEventListeners(); // ⭐️ index 専用イベントを再初期化
-// }
 
 // ✅ イベント関係の初期化　TODO イベント関係はすべてここにまとめる
 function initEventListeners() {
@@ -666,7 +663,7 @@ function attachBackButton() {
         const pageType = getPageType(path);
 
         switch(pageType){
-          case "work": {
+          case "work": { // workページ → index.htmlに遷移の場合
             const targetWork = worksInstances.find((work) => work.$.link === path); 
             // console.log(targetWork);
             await hideContent(targetWork); // ⭐️コンテンツ非表示
@@ -676,7 +673,9 @@ function attachBackButton() {
             break;
           }
 
-          case "about": {
+          case "about": { // aboutページ → index.htmlに遷移の場合
+            // 何かのアニメーション追加
+
             await loadPage("/");
             await pushHistory("/");
             break;
@@ -689,7 +688,6 @@ function attachBackButton() {
       } finally {
         isAnimating = false;
       }
-      
     });
   }
 }

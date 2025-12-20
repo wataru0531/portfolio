@@ -2,19 +2,23 @@
 // ✅　index.htmlを生成する
 
 export function createHomeMain(){
-  return `
-    <!-- l-works -->
-    <section class="l-works p-works" id="js-works">
-      ${ createWorks() }
-    </section>
-    <!-- l-works -->
+  const main = document.createElement("main");
 
-    <!-- l-contents -->
-    <section class="l-content p-content">
-      ${ createContents() }
-    </section>
+  main.innerHTML = `
+    <!-- l-works -->
+      <section class="l-works p-works" id="js-works">
+        ${ createWorks() }
+      </section>
+      <!-- l-works -->
+
+      <!-- l-contents -->
+      <section class="l-content p-content">
+        ${ createContents() }
+      </section>
     <!-- content-wrap -->
   `
+
+  return main;
 }
 
 
