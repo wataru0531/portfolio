@@ -1,27 +1,6 @@
 // TODO
 
-// ⭐️ここから
-// htmlのクラス名の修正、わかりやすくする
-// CSSを変更
-// jsの変数名などの修正
-
-// popstate、ページん遷移など、挙動の確認
-
-// aboutページの追加
-
-// historyの種類を調べる → history.back(); // ブラウザの履歴においての戻ると同じ動
-//                       history.pushState();
-//                       history.replace()
-
-// ⭕️index.html以外では画像クリックできない様にする　pointer-events: none; を付与
-
-// ⭕️showContentをtlを使わない形に変更。hideContentのような感じ
-
-// 画像の移動が終わってからテキスト関係を表示される
-
-// リファクタ。関数の処理を分ける。
-
-// アニメーションの修正、追加
+// ⭐️ aboutページを開いてから戻す処理 → アニメーション付きで元に戻す
 
 import Lenis from "lenis";
 import gsap from "gsap";
@@ -108,12 +87,32 @@ function animateOnScroll() {
   }
 }
 
-// .workの初期化
+// ✅ Workの初期化
 const worksInstances = [];
 works.forEach((work, idx) => {
   // console.log(work) // .work
   worksInstances.push(new Work(work));
 });
+
+let allWorks = null; // 👉 インデックス付きの全てのWorksを取得
+
+const allWorksWithIndex = [];
+worksInstances.map(( work, idx ) => {
+  allWorksWithIndex.push({ idx, work })
+});
+// console.log(allWorksWithIndex); // (4) [{idx: 0, work: Work}, {…}, {…}, {…}]
+
+// ✅ ビューポートに入っているWorkを取得
+// function getAllWorks(){
+//   let array = [];
+
+//   worksInstances.map(( work, idx ) => {
+//     array.push({ idx, work })
+//   });
+
+//   return array;
+// }
+
 
 // ✅ 初期化処理
 document.addEventListener("DOMContentLoaded", async () => {
@@ -428,7 +427,7 @@ function initEventListeners() {
 }
 
 // ✅ クリックしたwork以外で、ビューポートに少しでも入っているアイテムを配列に格納する処理
-function getAdjacentItems(_work) {
+function getAdjacentWorks(_work) {
   let array = [];
 
   for (const [idx, work] of worksInstances.entries()) {
@@ -442,6 +441,7 @@ function getAdjacentItems(_work) {
   return array;
 }
 
+
 // ✅ コンテンツを表示
 async function showContent(_work, isAnimate = true) {
   // index.html以外はアニメーションさせない
@@ -453,7 +453,7 @@ async function showContent(_work, isAnimate = true) {
 
   const workIndex = worksInstances.indexOf(_work);
   // console.log(workIndex)
-  const adjacentWorks = getAdjacentItems(_work); // ビューポートに入っているworkを取得
+  const adjacentWorks = getAdjacentWorks(_work); // ビューポートに入っているworkを取得
   _work.adjacentWorks = adjacentWorks;
 
   const contentInner = document.querySelector("#js-content-inner");
@@ -670,6 +670,7 @@ async function hideContent(_work) {
   });
 }
 
+
 // ✅ aboutページを表示
 async function showAboutPage(_about, isAnimate = true) {
    // index.html以外はアニメーションさせない
@@ -679,13 +680,6 @@ async function showAboutPage(_about, isAnimate = true) {
   // ページに応じたアニメーション設定
   const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
 
-  // 👉 ビューポートに入っているworkを取得 → 全て外に出す
-
-  // const workIndex = worksInstances.indexOf(_work);
-  // console.log(workIndex)
-  // const adjacentWorks = getAdjacentItems(_work);
-  // _work.adjacentWorks = adjacentWorks;
-
   const aboutInner = document.querySelector("#js-about-inner");
   // console.log(aboutInner)
 
@@ -694,8 +688,6 @@ async function showAboutPage(_about, isAnimate = true) {
   document.body.classList.add("js-about-open");
 
   // ⭐️ ここからworkを外に出すアニメーションから → 新しい関数をつくる
-
-  // ここからアニメーション
 
   // gsap.set([contentInstance.$.titleInner, contentInstance.$.metaInner], {
   //   yPercent: -101,
@@ -720,105 +712,194 @@ async function showAboutPage(_about, isAnimate = true) {
   // const flipstate = Flip.getState(_work.$.image);
   // contentInstance.$.contentImageWrapper.appendChild(_work.$.image);
 
-  // await Promise.all([
-  //   // 👉 実際にPromiseオブジェクトを返しているのは、new Promiseのみ。gsap.toは解決済みとなる。
-  //   new Promise((resolve) => {
-  //     Flip.from(flipstate, {
-  //       duration: config.duration,
-  //       ease: config.ease,
-  //       absolute: true,
-  //       force3D: true,
-  //       onUpdate() {
-  //         const progress = this.progress();
-  //       },
-  //       onComplete: resolve,
-  //     });
-  //   }),
+  await Promise.all([
+    // 👉 実際にPromiseオブジェクトを返しているのは、new Promiseのみ。gsap.toは解決済みとなる。
+    // new Promise((resolve) => {
+    //   Flip.from(flipstate, {
+    //     duration: config.duration,
+    //     ease: config.ease,
+    //     absolute: true,
+    //     force3D: true,
+    //     onUpdate() {
+    //       const progress = this.progress();
+    //     },
+    //     onComplete: resolve,
+    //   });
+    // }),
 
-  //   gsap.to(_work.$.titleInner, {
-  //     yPercent: 101,
-  //     opacity: 0,
-  //     stagger: -0.03,
-  //     ...config,
-  //   }),
+    // gsap.to(_work.$.titleInner, {
+    //   yPercent: 101,
+    //   opacity: 0,
+    //   stagger: -0.03,
+    //   ...config,
+    // }),
 
-  //   gsap.to(_work.$.description, {
-  //     yPercent: 101,
-  //     opacity: 0,
-  //     ...config,
-  //   }),
+    // gsap.to(_work.$.description, {
+    //   yPercent: 101,
+    //   opacity: 0,
+    //   ...config,
+    // }),
 
-  //   gsap.to(_work.$.imageInner, {
-  //     scaleY: 1,
-  //     ...config,
-  //   }),
+    // gsap.to(_work.$.imageInner, {
+    //   scaleY: 1,
+    //   ...config,
+    // }),
 
-  //   ..._work.adjacentWorks.map((el) =>
-  //     gsap.to(el.work.$.el, {
-  //       y: el.idx < workIndex ? -window.innerHeight : window.innerHeight,
-  //       ...config,
-  //     })
-  //   ),
+    ...allWorksWithIndex.map((el) => {
+      // console.log(el)
+      const viewportCenterY = window.innerHeight / 2;
+      const rect = el.work.$.el.getBoundingClientRect();
+      // console.log(rect); // DOMRect {x: 49.578125, y: 200, width: 591.421875, height: 400, top: 200, …}
 
-  //   gsap.to(backBtn, {
-  //     opacity: 1,
-  //     delay: isAnimate ? 0.15 : 0,
-  //     ...config,
-  //   }),
+      const rectCenterY = rect.top + rect.height / 2;
+      
+      const y = rectCenterY < viewportCenterY ? -window.innerHeight : window.innerHeight;
 
-  //   // コンテンツ関連
-  //   gsap.to(contentInstance.$.titleInner, {
-  //     yPercent: 0,
-  //     opacity: 1,
-  //     stagger: -0.05,
-  //     delay: isAnimate ? 0.15 : 0,
-  //     ...config,
-  //   }),
+      gsap.to(el.work.$.el, {
+        y,
+        ...config,
+      })
+    }),
 
-  //   gsap.to(contentInstance.$.metaInner, {
-  //     yPercent: 0,
-  //     opacity: 1,
-  //     delay: isAnimate ? 0.15 : 0,
-  //     ...config,
-  //   }),
+    gsap.to(backBtn, {
+      opacity: 1,
+      delay: isAnimate ? 0.15 : 0,
+      ...config,
+    }),
 
-  //   gsap.to(contentInstance.$.thumbs, {
-  //     scale: 1,
-  //     yPercent: 0,
-  //     stagger: -0.05,
-  //     delay: isAnimate ? 0.15 : 0,
-  //     ...config,
-  //   }),
+    // コンテンツ関連
+    // gsap.to(contentInstance.$.titleInner, {
+    //   yPercent: 0,
+    //   opacity: 1,
+    //   stagger: -0.05,
+    //   delay: isAnimate ? 0.15 : 0,
+    //   ...config,
+    // }),
 
-  //   new Promise((resolve) => {
-  //     if (!isAnimate) {
-  //       // アニメーションさせたいくないとき
-  //       setTimeout(() => {
-  //         contentInstance.multiLine.in(isAnimate);
-  //         gsap.set(contentInstance.$.text, {
-  //           opacity: 1,
-  //           onComplete: resolve,
-  //         });
-  //       }, 0);
-  //     } else {
-  //       // アニメーションさせたい時
+    // gsap.to(contentInstance.$.metaInner, {
+    //   yPercent: 0,
+    //   opacity: 1,
+    //   delay: isAnimate ? 0.15 : 0,
+    //   ...config,
+    // }),
 
-  //       setTimeout(() => {
-  //         contentInstance.multiLine.in(isAnimate); // ライン
+    // gsap.to(contentInstance.$.thumbs, {
+    //   scale: 1,
+    //   yPercent: 0,
+    //   stagger: -0.05,
+    //   delay: isAnimate ? 0.15 : 0,
+    //   ...config,
+    // }),
 
-  //         gsap.set(contentInstance.$.text, {
-  //           opacity: 1,
-  //           duration: 0.3,
-  //           onComplete: resolve,
-  //         });
-  //       }, 150);
-  //     }
-  //   }),
-  // ]);
+    // new Promise((resolve) => {
+    //   if (!isAnimate) {
+    //     // アニメーションさせたいくないとき
+    //     setTimeout(() => {
+    //       contentInstance.multiLine.in(isAnimate);
+    //       gsap.set(contentInstance.$.text, {
+    //         opacity: 1,
+    //         onComplete: resolve,
+    //       });
+    //     }, 0);
+    //   } else {
+    //     // アニメーションさせたい時
+
+    //     setTimeout(() => {
+    //       contentInstance.multiLine.in(isAnimate); // ライン
+
+    //       gsap.set(contentInstance.$.text, {
+    //         opacity: 1,
+    //         duration: 0.3,
+    //         onComplete: resolve,
+    //       });
+    //     }, 150);
+    //   }
+    // }),
+  ]);
 }
 
 // ✅ aboutページを非表示
-async function hideAboutPage(_about, isAnimate = true) {}
+async function hideAboutPage(_about, isAnimate = true) {
+
+  // contentInstance.multiLine.out(); // 下部のテキストアニメーション。TODO 非同期に
+
+  await Promise.all([
+    // 全て並列で実行
+    // gsap.to(backBtn, {
+    //   opacity: 0,
+    //   ...ANIMATION_CONFIG,
+    // }),
+
+    // gsap.to(contentInstance.$.titleInner, {
+    //   yPercent: -101,
+    //   opacity: 0,
+    //   stagger: 0.05,
+    //   ...ANIMATION_CONFIG,
+    // }),
+
+    // gsap.to(contentInstance.$.metaInner, {
+    //   yPercent: -101,
+    //   opacity: 0,
+    //   ...ANIMATION_CONFIG,
+    // }),
+
+    // gsap.to(contentInstance.$.thumbs, {
+    //   scale: 0,
+    //   yPercent: 150,
+    //   stagger: -0.05,
+    //   ...ANIMATION_CONFIG,
+    // }),
+
+    gsap.to(
+      _work.adjacentWorks.map((el) => el.work.$.el),
+      {
+        y: 0, // ずらしたアイテムを元に戻す
+        delay: 0.15,
+        ...ANIMATION_CONFIG,
+      }
+    ),
+
+    gsap.to(_work.$.titleInner, {
+      yPercent: 0,
+      opacity: 1,
+      stagger: 0.03,
+      delay: 0.15,
+      ...ANIMATION_CONFIG,
+    }),
+
+    gsap.to(_work.$.description, {
+      yPercent: 0,
+      opacity: 1,
+      delay: 0.15,
+      ...ANIMATION_CONFIG,
+    }),
+
+    gsap.to(_work.$.imageInner, {
+      scaleY: _work.imageInnerScaleYCached,
+      delay: 0.15,
+      ...ANIMATION_CONFIG,
+    }),
+
+    // FLIP → Promiseオブジェクトを返さないのでラップ
+    new Promise((resolve) => {
+      Flip.from(flipstate, {
+        duration: ANIMATION_CONFIG.duration,
+        ease: ANIMATION_CONFIG.ease,
+        absolute: true,
+        delay: 0.15,
+        onUpdate() {
+          // console.log(this); // Timeline2 {vars: {…}, ...} ⭐️Flip.fromは内部でタイムラインを使っている
+          const progress = this.progress();
+          // console.log("FLIP進行度:", progress);
+        },
+        onComplete: resolve,
+      });
+    }),
+  ]).then(() => {
+    lenis.start();
+    document.body.classList.remove("content-open");
+  });
+}
 
 
 // ⭐️ 戻るボタン → どんな時もindex.htmlに戻す
