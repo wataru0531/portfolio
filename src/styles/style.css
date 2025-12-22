@@ -70,6 +70,12 @@ body {
 	height: 100vh;
 }
 
+/* ✅ aboutページ オープン */
+.js-about-open {
+	overflow: hidden;
+	height: 100vh;
+}
+
 .about-open{
 	overflow: hidden;
 	height: 100vh;
@@ -238,6 +244,10 @@ main {
 	pointer-events: none;
 }
 
+.js-about-open .p-works {
+	pointer-events: none;
+}
+
 .p-work {
 	min-height: 400px;
 	padding: 3rem 0 0;
@@ -350,6 +360,13 @@ main {
 	pointer-events: auto;
 }
 
+/* 
+.js-about-open .action {
+	visibility: visible;
+	pointer-events: auto;
+} */
+
+
 .action svg {
 	width: 2em;
 	height: 2em;
@@ -399,6 +416,8 @@ main {
 .content-open .content__image-wrapper{
 	pointer-events: none;
 }
+
+
 
 .content__title {
 	font-family: scotch-display, sans-serif;
@@ -490,7 +509,11 @@ main {
 	opacity: 0;
 }
 
-
+.js-about-open .p-about__inner{
+	position: relative;
+	pointer-events: auto;
+	opacity: 1;
+}
 
 
 

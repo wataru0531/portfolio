@@ -225,7 +225,6 @@ window.addEventListener("popstate", async (e) => {
         await showContent(targetWork); // コンテンツを表示
 
         previousPath = url;
-
         break;
       }
 
@@ -234,7 +233,6 @@ window.addEventListener("popstate", async (e) => {
         await loadPage("/about"); // ⭐️ TODO
 
         previousPath = "/about";
-
         break;
       }
 
@@ -421,6 +419,8 @@ function initEventListeners() {
 
     await loadPage(link);
 
+    showAboutPage()
+
     isAnimating = false;
   });
 
@@ -453,7 +453,7 @@ async function showContent(_work, isAnimate = true) {
 
   const workIndex = worksInstances.indexOf(_work);
   // console.log(workIndex)
-  const adjacentWorks = getAdjacentItems(_work);
+  const adjacentWorks = getAdjacentItems(_work); // ビューポートに入っているworkを取得
   _work.adjacentWorks = adjacentWorks;
 
   const contentInner = document.querySelector("#js-content-inner");
@@ -670,7 +670,6 @@ async function hideContent(_work) {
   });
 }
 
-
 // ✅ aboutページを表示
 async function showAboutPage(_about, isAnimate = true) {
    // index.html以外はアニメーションさせない
@@ -679,6 +678,8 @@ async function showAboutPage(_about, isAnimate = true) {
 
   // ページに応じたアニメーション設定
   const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
+
+  // 👉 ビューポートに入っているworkを取得 → 全て外に出す
 
   // const workIndex = worksInstances.indexOf(_work);
   // console.log(workIndex)
@@ -690,135 +691,135 @@ async function showAboutPage(_about, isAnimate = true) {
 
   aboutInstance = new About(aboutInner); // ⭐️ Content初期化
 
-  document.body.classList.add("about-open");
+  document.body.classList.add("js-about-open");
 
-  // ⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから
-  // ⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから
-  // ⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから⭐️ここからここから
-  // → about-open でのCSS変更から
+  // ⭐️ ここからworkを外に出すアニメーションから → 新しい関数をつくる
 
-  gsap.set([contentInstance.$.titleInner, contentInstance.$.metaInner], {
-    yPercent: -101,
-    opacity: 0,
-  });
-  gsap.set(contentInstance.$.thumbs, {
-    transformOrigin: "0% 0%",
-    scale: 0,
-    yPercent: 150,
-  });
-  gsap.set([contentInstance.$.text, backBtn], {
-    opacity: 0,
-  });
+  // ここからアニメーション
+
+  // gsap.set([contentInstance.$.titleInner, contentInstance.$.metaInner], {
+  //   yPercent: -101,
+  //   opacity: 0,
+  // });
+  // gsap.set(contentInstance.$.thumbs, {
+  //   transformOrigin: "0% 0%",
+  //   scale: 0,
+  //   yPercent: 150,
+  // });
+  // gsap.set([contentInstance.$.text, backBtn], {
+  //   opacity: 0,
+  // });
 
   // ⭐️ TODO
-  const scaleY =
-    _work.$.imageInner.getBoundingClientRect().height /
-    _work.$.imageInner.offsetHeight;
-  // console.log(scaleY);
-  _work.imageInnerScaleYCached = scaleY;
+  // const scaleY =
+  //   _work.$.imageInner.getBoundingClientRect().height /
+  //   _work.$.imageInner.offsetHeight;
+  // // console.log(scaleY);
+  // _work.imageInnerScaleYCached = scaleY;
 
-  const flipstate = Flip.getState(_work.$.image);
-  contentInstance.$.contentImageWrapper.appendChild(_work.$.image);
+  // const flipstate = Flip.getState(_work.$.image);
+  // contentInstance.$.contentImageWrapper.appendChild(_work.$.image);
 
-  await Promise.all([
-    // 👉 実際にPromiseオブジェクトを返しているのは、new Promiseのみ。gsap.toは解決済みとなる。
-    new Promise((resolve) => {
-      Flip.from(flipstate, {
-        duration: config.duration,
-        ease: config.ease,
-        absolute: true,
-        force3D: true,
-        onUpdate() {
-          const progress = this.progress();
-        },
-        onComplete: resolve,
-      });
-    }),
+  // await Promise.all([
+  //   // 👉 実際にPromiseオブジェクトを返しているのは、new Promiseのみ。gsap.toは解決済みとなる。
+  //   new Promise((resolve) => {
+  //     Flip.from(flipstate, {
+  //       duration: config.duration,
+  //       ease: config.ease,
+  //       absolute: true,
+  //       force3D: true,
+  //       onUpdate() {
+  //         const progress = this.progress();
+  //       },
+  //       onComplete: resolve,
+  //     });
+  //   }),
 
-    gsap.to(_work.$.titleInner, {
-      yPercent: 101,
-      opacity: 0,
-      stagger: -0.03,
-      ...config,
-    }),
+  //   gsap.to(_work.$.titleInner, {
+  //     yPercent: 101,
+  //     opacity: 0,
+  //     stagger: -0.03,
+  //     ...config,
+  //   }),
 
-    gsap.to(_work.$.description, {
-      yPercent: 101,
-      opacity: 0,
-      ...config,
-    }),
+  //   gsap.to(_work.$.description, {
+  //     yPercent: 101,
+  //     opacity: 0,
+  //     ...config,
+  //   }),
 
-    gsap.to(_work.$.imageInner, {
-      scaleY: 1,
-      ...config,
-    }),
+  //   gsap.to(_work.$.imageInner, {
+  //     scaleY: 1,
+  //     ...config,
+  //   }),
 
-    ..._work.adjacentWorks.map((el) =>
-      gsap.to(el.work.$.el, {
-        y: el.idx < workIndex ? -window.innerHeight : window.innerHeight,
-        ...config,
-      })
-    ),
+  //   ..._work.adjacentWorks.map((el) =>
+  //     gsap.to(el.work.$.el, {
+  //       y: el.idx < workIndex ? -window.innerHeight : window.innerHeight,
+  //       ...config,
+  //     })
+  //   ),
 
-    gsap.to(backBtn, {
-      opacity: 1,
-      delay: isAnimate ? 0.15 : 0,
-      ...config,
-    }),
+  //   gsap.to(backBtn, {
+  //     opacity: 1,
+  //     delay: isAnimate ? 0.15 : 0,
+  //     ...config,
+  //   }),
 
-    // コンテンツ関連
-    gsap.to(contentInstance.$.titleInner, {
-      yPercent: 0,
-      opacity: 1,
-      stagger: -0.05,
-      delay: isAnimate ? 0.15 : 0,
-      ...config,
-    }),
+  //   // コンテンツ関連
+  //   gsap.to(contentInstance.$.titleInner, {
+  //     yPercent: 0,
+  //     opacity: 1,
+  //     stagger: -0.05,
+  //     delay: isAnimate ? 0.15 : 0,
+  //     ...config,
+  //   }),
 
-    gsap.to(contentInstance.$.metaInner, {
-      yPercent: 0,
-      opacity: 1,
-      delay: isAnimate ? 0.15 : 0,
-      ...config,
-    }),
+  //   gsap.to(contentInstance.$.metaInner, {
+  //     yPercent: 0,
+  //     opacity: 1,
+  //     delay: isAnimate ? 0.15 : 0,
+  //     ...config,
+  //   }),
 
-    gsap.to(contentInstance.$.thumbs, {
-      scale: 1,
-      yPercent: 0,
-      stagger: -0.05,
-      delay: isAnimate ? 0.15 : 0,
-      ...config,
-    }),
+  //   gsap.to(contentInstance.$.thumbs, {
+  //     scale: 1,
+  //     yPercent: 0,
+  //     stagger: -0.05,
+  //     delay: isAnimate ? 0.15 : 0,
+  //     ...config,
+  //   }),
 
-    new Promise((resolve) => {
-      if (!isAnimate) {
-        // アニメーションさせたいくないとき
-        setTimeout(() => {
-          contentInstance.multiLine.in(isAnimate);
-          gsap.set(contentInstance.$.text, {
-            opacity: 1,
-            onComplete: resolve,
-          });
-        }, 0);
-      } else {
-        // アニメーションさせたい時
+  //   new Promise((resolve) => {
+  //     if (!isAnimate) {
+  //       // アニメーションさせたいくないとき
+  //       setTimeout(() => {
+  //         contentInstance.multiLine.in(isAnimate);
+  //         gsap.set(contentInstance.$.text, {
+  //           opacity: 1,
+  //           onComplete: resolve,
+  //         });
+  //       }, 0);
+  //     } else {
+  //       // アニメーションさせたい時
 
-        setTimeout(() => {
-          contentInstance.multiLine.in(isAnimate); // ライン
+  //       setTimeout(() => {
+  //         contentInstance.multiLine.in(isAnimate); // ライン
 
-          gsap.set(contentInstance.$.text, {
-            opacity: 1,
-            duration: 0.3,
-            onComplete: resolve,
-          });
-        }, 150);
-      }
-    }),
-  ]);
+  //         gsap.set(contentInstance.$.text, {
+  //           opacity: 1,
+  //           duration: 0.3,
+  //           onComplete: resolve,
+  //         });
+  //       }, 150);
+  //     }
+  //   }),
+  // ]);
 }
 
 // ✅ aboutページを非表示
 async function hideAboutPage(_about, isAnimate = true) {}
+
 
 // ⭐️ 戻るボタン → どんな時もindex.htmlに戻す
 function attachBackButton() {
