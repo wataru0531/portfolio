@@ -5,6 +5,19 @@
 	box-sizing: border-box;
 }
 
+button{
+	background: none;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	font: inherit;
+	fill: currentColor;
+	cursor: pointer;
+	color: inherit;
+	display: flex;
+	align-items: center;
+}
+
 
 :root {
 	font-size: 18px;
@@ -55,7 +68,6 @@ body {
 
   /* スクロールバー 非表示 */
   scrollbar-width: none; /* Firefox */
-
 }
 
 /* webkit系 Chrome Safari Edge */
@@ -75,12 +87,6 @@ body {
 	overflow: hidden;
 	height: 100vh;
 }
-
-.about-open{
-	overflow: hidden;
-	height: 100vh;
-}
-
 
 .oh {
     position: relative;
@@ -132,19 +138,7 @@ a:focus-visible {
 	background: transparent;
 }
 
-.unbutton {
-	background: none;
-	border: 0;
-	padding: 0;
-	margin: 0;
-	font: inherit;
-	fill: currentColor;
-	cursor: pointer;
-	color: inherit;
-	display: flex;
-	align-items: center;
-}
-
+/* ✅ 戻るボタン → work から index.html用 */
 .unbutton:focus {
 	outline: none;
 }
@@ -156,6 +150,8 @@ a:focus-visible {
 .unbutton span:last-child {
 	margin-left: 1rem;
 }
+
+/* ✅ 戻るボタン → aboutページ用*/
 
 main {
 	margin-top: 200px;
@@ -513,6 +509,11 @@ main {
 	position: relative;
 	pointer-events: auto;
 	opacity: 1;
+}
+
+.js-about-open .action{
+	visibility: visible;
+	pointer-events: auto;
 }
 
 

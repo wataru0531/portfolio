@@ -1,6 +1,6 @@
 // TODO
 
-// ⭐️ aboutページを開いてから戻す処理 → アニメーション付きで元に戻す
+// ⭐️ aboutページを開いてから戻す処理 → 戻るボタンの実装から ... backAboutToIndexBtn
 
 import Lenis from "lenis";
 import gsap from "gsap";
@@ -21,7 +21,9 @@ const ANIMATION_CONFIG = { duration: 1.5, ease: "power4.inOut" };
 
 const works = [...document.querySelectorAll("#js-work")];
 
-const backBtn = document.querySelector(".action--back");
+const backWorkToIndexBtn = document.querySelector(".action--back"); // 戻るボタン
+const backAboutToIndexBtn = document.getElementById("js-back-about");
+// console.log(backAboutToIndexBtn)
 const headerAboutBtn = document.getElementById("js-header-about-btn");
 
 let lenis;
@@ -29,6 +31,9 @@ let currentWorkIdx = -1;
 let isAnimating = false;
 
 const parser = new DOMParser(); // 文字列を実際のDOMに変換するパーサー
+
+// ✅ 遷移前のurlとして持つ
+let previousPath = window.location.pathname; // 現在表示中のパス
 
 // 
 const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
@@ -94,8 +99,8 @@ works.forEach((work, idx) => {
   worksInstances.push(new Work(work));
 });
 
-let allWorks = null; // 👉 インデックス付きの全てのWorksを取得
 
+// ✅ 全てのWork、index付きで取得
 const allWorksWithIndex = [];
 worksInstances.map(( work, idx ) => {
   allWorksWithIndex.push({ idx, work })
@@ -119,8 +124,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (isAnimating) return; // アニメーション中は処理を受け付けない
   isAnimating = true;
 
-  const path =
-    window.location.pathname === "/" ? "/" : window.location.pathname;
+  previousPath = window.location.pathname; // 現在のパスを取得
+
+  const path = window.location.pathname === "/" ? "/" : window.location.pathname;
   // console.log(path); // /src/pages/work01.html
 
   await pushHistory(path); // ブラウザに履歴を残す
@@ -145,8 +151,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   isAnimating = false;
 });
 
-// ✅ 遷移前のurlとして持つ
-let previousPath = window.location.pathname; // 現在表示中のパス
 
 // ⭐️プラウザに履歴を残す。履歴を辿れるように設定する → そのページの状態をオブジェクトに格納しておくことができる。
 // ⭐️history.pushState(state, title, url);
@@ -441,6 +445,13 @@ function getAdjacentWorks(_work) {
   return array;
 }
 
+// ✅ 全てのWorkを対象に、画面ないに入っているWorkのみを取得
+function getVisibleWorksWorks(){
+  return worksInstances
+          .map((work, idx) => ({ idx: idx, work: work }))
+          .filter(({ work }) => utils.isInViewport(work.$.el));
+}
+
 
 // ✅ コンテンツを表示
 async function showContent(_work, isAnimate = true) {
@@ -472,7 +483,7 @@ async function showContent(_work, isAnimate = true) {
     scale: 0,
     yPercent: 150,
   });
-  gsap.set([contentInstance.$.text, backBtn], {
+  gsap.set([contentInstance.$.text, backWorkToIndexBtn], {
     opacity: 0,
   });
 
@@ -526,7 +537,7 @@ async function showContent(_work, isAnimate = true) {
       })
     ),
 
-    gsap.to(backBtn, {
+    gsap.to(backWorkToIndexBtn, {
       opacity: 1,
       delay: isAnimate ? 0.15 : 0,
       ...config,
@@ -594,7 +605,7 @@ async function hideContent(_work) {
 
   await Promise.all([
     // 全て並列で実行
-    gsap.to(backBtn, {
+    gsap.to(backWorkToIndexBtn, {
       opacity: 0,
       ...ANIMATION_CONFIG,
     }),
@@ -677,15 +688,24 @@ async function showAboutPage(_about, isAnimate = true) {
   // console.log(_work); // Work {$: {…}}
   lenis.stop();
 
+  document.body.classList.add("js-about-open");
+
   // ページに応じたアニメーション設定
   const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
 
   const aboutInner = document.querySelector("#js-about-inner");
   // console.log(aboutInner)
 
-  aboutInstance = new About(aboutInner); // ⭐️ Content初期化
+  aboutInstance = new About(aboutInner); // ⭐️ Content初期化 → これを使いアニメーションさせる
 
-  document.body.classList.add("js-about-open");
+  // const adjacentWorks = getAdjacentWorks(_work); // ビューポートに入っているworkを取得
+  // _work.adjacentWorks = adjacentWorks;
+
+  // ビューポート内にあるWorkを取得
+  const worksInViewport = getVisibleWorksWorks();
+  // console.log(worksInViewport); // (3) [{idx: 0, work: Work}, {…}, {…}]
+
+  aboutInstance.worksInViewport = worksInViewport;
 
   // ⭐️ ここからworkを外に出すアニメーションから → 新しい関数をつくる
 
@@ -698,9 +718,9 @@ async function showAboutPage(_about, isAnimate = true) {
   //   scale: 0,
   //   yPercent: 150,
   // });
-  // gsap.set([contentInstance.$.text, backBtn], {
-  //   opacity: 0,
-  // });
+  gsap.set(backAboutToIndexBtn, {
+    opacity: 0,
+  });
 
   // ⭐️ TODO
   // const scaleY =
@@ -745,7 +765,7 @@ async function showAboutPage(_about, isAnimate = true) {
     //   ...config,
     // }),
 
-    ...allWorksWithIndex.map((el) => {
+    ...aboutInstance.worksInViewport.map((el) => { // 👉 ビューポート内にあるWorkだけ画面外に動かす
       // console.log(el)
       const viewportCenterY = window.innerHeight / 2;
       const rect = el.work.$.el.getBoundingClientRect();
@@ -761,7 +781,7 @@ async function showAboutPage(_about, isAnimate = true) {
       })
     }),
 
-    gsap.to(backBtn, {
+    gsap.to(backAboutToIndexBtn, {
       opacity: 1,
       delay: isAnimate ? 0.15 : 0,
       ...config,
@@ -825,7 +845,7 @@ async function hideAboutPage(_about, isAnimate = true) {
 
   await Promise.all([
     // 全て並列で実行
-    // gsap.to(backBtn, {
+    // gsap.to(backWorkToIndexBtn, {
     //   opacity: 0,
     //   ...ANIMATION_CONFIG,
     // }),
@@ -850,75 +870,74 @@ async function hideAboutPage(_about, isAnimate = true) {
     //   ...ANIMATION_CONFIG,
     // }),
 
-    gsap.to(
-      _work.adjacentWorks.map((el) => el.work.$.el),
-      {
+    // ✅ 画面外に移動させたWorkを元に戻す
+    gsap.to(...aboutInstance.worksInViewport.map((el) => el.work.$.el), {
         y: 0, // ずらしたアイテムを元に戻す
         delay: 0.15,
         ...ANIMATION_CONFIG,
       }
     ),
 
-    gsap.to(_work.$.titleInner, {
-      yPercent: 0,
-      opacity: 1,
-      stagger: 0.03,
-      delay: 0.15,
-      ...ANIMATION_CONFIG,
-    }),
+    // gsap.to(_work.$.titleInner, {
+    //   yPercent: 0,
+    //   opacity: 1,
+    //   stagger: 0.03,
+    //   delay: 0.15,
+    //   ...ANIMATION_CONFIG,
+    // }),
 
-    gsap.to(_work.$.description, {
-      yPercent: 0,
-      opacity: 1,
-      delay: 0.15,
-      ...ANIMATION_CONFIG,
-    }),
+    // gsap.to(_work.$.description, {
+    //   yPercent: 0,
+    //   opacity: 1,
+    //   delay: 0.15,
+    //   ...ANIMATION_CONFIG,
+    // }),
 
-    gsap.to(_work.$.imageInner, {
-      scaleY: _work.imageInnerScaleYCached,
-      delay: 0.15,
-      ...ANIMATION_CONFIG,
-    }),
+    // gsap.to(_work.$.imageInner, {
+    //   scaleY: _work.imageInnerScaleYCached,
+    //   delay: 0.15,
+    //   ...ANIMATION_CONFIG,
+    // }),
 
-    // FLIP → Promiseオブジェクトを返さないのでラップ
-    new Promise((resolve) => {
-      Flip.from(flipstate, {
-        duration: ANIMATION_CONFIG.duration,
-        ease: ANIMATION_CONFIG.ease,
-        absolute: true,
-        delay: 0.15,
-        onUpdate() {
-          // console.log(this); // Timeline2 {vars: {…}, ...} ⭐️Flip.fromは内部でタイムラインを使っている
-          const progress = this.progress();
-          // console.log("FLIP進行度:", progress);
-        },
-        onComplete: resolve,
-      });
-    }),
+    // // FLIP → Promiseオブジェクトを返さないのでラップ
+    // new Promise((resolve) => {
+    //   Flip.from(flipstate, {
+    //     duration: ANIMATION_CONFIG.duration,
+    //     ease: ANIMATION_CONFIG.ease,
+    //     absolute: true,
+    //     delay: 0.15,
+    //     onUpdate() {
+    //       // console.log(this); // Timeline2 {vars: {…}, ...} ⭐️Flip.fromは内部でタイムラインを使っている
+    //       const progress = this.progress();
+    //       // console.log("FLIP進行度:", progress);
+    //     },
+    //     onComplete: resolve,
+    //   });
+    // }),
   ]).then(() => {
     lenis.start();
-    document.body.classList.remove("content-open");
+    document.body.classList.remove("js-about-open");
   });
 }
 
 
 // ⭐️ 戻るボタン → どんな時もindex.htmlに戻す
 function attachBackButton() {
-  const backBtn = document.querySelector(".action--back");
+  const backWorkToIndexBtn = document.querySelector(".action--back");
 
-  if (backBtn) {
-    backBtn.addEventListener("click", async () => {
+  if (backWorkToIndexBtn) {
+    backWorkToIndexBtn.addEventListener("click", async () => {
       if (isAnimating) return; // アニメーション中は処理を受け付けない
       isAnimating = true;
 
       try {
-        const path = window.location.pathname;
+        const path = window.location.pathname; // 現在のパス
         // console.log(path); // /pages/about.html
         const pageType = getPageType(path);
+        // console.log(pageType); // home, work,about
 
         switch (pageType) {
-          case "work": {
-            // workページ → index.htmlに遷移の場合
+          case "work": { // workページ → index.htmlに遷移の場合
             const targetWork = worksInstances.find(
               (work) => work.$.link === path
             );
@@ -930,9 +949,10 @@ function attachBackButton() {
             break;
           }
 
-          case "about": {
-            // aboutページ → index.htmlに遷移の場合
-            // 何かのアニメーション追加
+          case "about": { // aboutページ → index.htmlに遷移の場合
+            // workを元に戻す、
+            // aboutの画像、テキストなどを元に戻すアニメーション
+
 
             await loadPage("/");
             await pushHistory("/");
