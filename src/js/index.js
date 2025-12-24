@@ -35,15 +35,20 @@ const parser = new DOMParser(); // 文字列を実際のDOMに変換するパー
 // ✅ 遷移前のurlとして持つ
 let previousPath = window.location.pathname; // 現在表示中のパス
 
-// 
+// ✅ Woks
 const contentGroupInner = document.querySelector(".content__group-inner"); // タイトルなど
 const contentThumbsInner = document.querySelector(".content__thumbs-inner"); // サムネイルなど
 
 let contentInstance; // new Contentのインスタンス
 
-// 
+let worksInViewport = null; // 画面に入っているWorkインスタンス。aboutクリック時
+
+
+// ✅ About
 const aboutInner = document.getElementById("js-about-inner");
 let aboutInstance; // new Aboutのインスタンス
+
+aboutInstance = new About(aboutInner); // ⭐️ About 初期化
 
 
 // ✅ Lenis初期化
@@ -106,17 +111,6 @@ worksInstances.map(( work, idx ) => {
   allWorksWithIndex.push({ idx, work })
 });
 // console.log(allWorksWithIndex); // (4) [{idx: 0, work: Work}, {…}, {…}, {…}]
-
-// ✅ ビューポートに入っているWorkを取得
-// function getAllWorks(){
-//   let array = [];
-
-//   worksInstances.map(( work, idx ) => {
-//     array.push({ idx, work })
-//   });
-
-//   return array;
-// }
 
 
 // ✅ 初期化処理
@@ -427,7 +421,7 @@ function initEventListeners() {
     isAnimating = false;
   });
 
-  attachBackButton(); // 戻るボタンの初期化
+  attachBackButton(); // 各ページから戻るボタンの初期化
 }
 
 // ✅ クリックしたwork以外で、ビューポートに少しでも入っているアイテムを配列に格納する処理
@@ -445,13 +439,12 @@ function getAdjacentWorks(_work) {
   return array;
 }
 
-// ✅ 全てのWorkを対象に、画面ないに入っているWorkのみを取得
-function getVisibleWorksWorks(){
+// ✅ 全てのWorkを対象に、画面内に入っているWorkのみを取得
+function getVisibleWorks(){
   return worksInstances
           .map((work, idx) => ({ idx: idx, work: work }))
           .filter(({ work }) => utils.isInViewport(work.$.el));
 }
-
 
 // ✅ コンテンツを表示
 async function showContent(_work, isAnimate = true) {
@@ -693,19 +686,9 @@ async function showAboutPage(_about, isAnimate = true) {
   // ページに応じたアニメーション設定
   const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
 
-  const aboutInner = document.querySelector("#js-about-inner");
-  // console.log(aboutInner)
-
-  aboutInstance = new About(aboutInner); // ⭐️ Content初期化 → これを使いアニメーションさせる
-
-  // const adjacentWorks = getAdjacentWorks(_work); // ビューポートに入っているworkを取得
-  // _work.adjacentWorks = adjacentWorks;
-
   // ビューポート内にあるWorkを取得
-  const worksInViewport = getVisibleWorksWorks();
+  worksInViewport = getVisibleWorks();
   // console.log(worksInViewport); // (3) [{idx: 0, work: Work}, {…}, {…}]
-
-  aboutInstance.worksInViewport = worksInViewport;
 
   // ⭐️ ここからworkを外に出すアニメーションから → 新しい関数をつくる
 
@@ -765,7 +748,7 @@ async function showAboutPage(_about, isAnimate = true) {
     //   ...config,
     // }),
 
-    ...aboutInstance.worksInViewport.map((el) => { // 👉 ビューポート内にあるWorkだけ画面外に動かす
+    [...worksInViewport].map((el) => { // 👉 ビューポート内にあるWorkだけ画面外に動かす
       // console.log(el)
       const viewportCenterY = window.innerHeight / 2;
       const rect = el.work.$.el.getBoundingClientRect();
@@ -781,7 +764,7 @@ async function showAboutPage(_about, isAnimate = true) {
       })
     }),
 
-    gsap.to(backAboutToIndexBtn, {
+    gsap.to(backAboutToIndexBtn, { // 
       opacity: 1,
       delay: isAnimate ? 0.15 : 0,
       ...config,
@@ -843,6 +826,8 @@ async function hideAboutPage(_about, isAnimate = true) {
 
   // contentInstance.multiLine.out(); // 下部のテキストアニメーション。TODO 非同期に
 
+  // console.log(aboutInstance)
+
   await Promise.all([
     // 全て並列で実行
     // gsap.to(backWorkToIndexBtn, {
@@ -871,7 +856,7 @@ async function hideAboutPage(_about, isAnimate = true) {
     // }),
 
     // ✅ 画面外に移動させたWorkを元に戻す
-    gsap.to(...aboutInstance.worksInViewport.map((el) => el.work.$.el), {
+    gsap.to([...worksInViewport].map((el) => el.work.$.el), {
         y: 0, // ずらしたアイテムを元に戻す
         delay: 0.15,
         ...ANIMATION_CONFIG,
@@ -920,49 +905,56 @@ async function hideAboutPage(_about, isAnimate = true) {
   });
 }
 
+// ✅ index.htmlに戻る処理
+function attachBackButton(){
+  if(backWorkToIndexBtn){ // workページ → index.html
+    backWorkToIndexBtn.addEventListener("click", handleBackToIndexPage);
+  }
+
+  if(backAboutToIndexBtn){ // aboutページ → index.html
+    backAboutToIndexBtn.addEventListener("click", handleBackToIndexPage);
+  }
+}
 
 // ⭐️ 戻るボタン → どんな時もindex.htmlに戻す
-function attachBackButton() {
-  const backWorkToIndexBtn = document.querySelector(".action--back");
+async function handleBackToIndexPage() {
+  if (isAnimating) return; // アニメーション中は処理を受け付けない
+  isAnimating = true;
 
-  if (backWorkToIndexBtn) {
-    backWorkToIndexBtn.addEventListener("click", async () => {
-      if (isAnimating) return; // アニメーション中は処理を受け付けない
-      isAnimating = true;
+  try {
+    const path = window.location.pathname; // 現在のパス
+    // console.log(path); // /pages/about.html
+    const pageType = getPageType(path);
+    // console.log(pageType); // home, work,about
 
-      try {
-        const path = window.location.pathname; // 現在のパス
-        // console.log(path); // /pages/about.html
-        const pageType = getPageType(path);
-        // console.log(pageType); // home, work,about
-
-        switch (pageType) {
-          case "work": { // workページ → index.htmlに遷移の場合
-            const targetWork = worksInstances.find(
-              (work) => work.$.link === path
-            );
-            // console.log(targetWork);
-            await hideContent(targetWork); // ⭐️コンテンツ非表示
-
-            await loadPage("/");
-            await pushHistory("/"); // ブラウザの履歴に記録
-            break;
-          }
-
-          case "about": { // aboutページ → index.htmlに遷移の場合
-            // workを元に戻す、
-            // aboutの画像、テキストなどを元に戻すアニメーション
-
-
-            await loadPage("/");
-            await pushHistory("/");
-            break;
-          }
+    switch (pageType) {
+      case "work": { // workページ → index.htmlに遷移の場合
+        const targetWork = worksInstances.find(
+          (work) => work.$.link === path
+        );
+        // console.log(targetWork);
+        if(targetWork) {
+          await hideContent(targetWork); // ⭐️コンテンツ非表示
         }
-      } catch (e) {
-      } finally {
-        isAnimating = false;
+
+        await loadPage("/");
+        await pushHistory("/"); // ブラウザの履歴に記録
+        break;
       }
-    });
+
+      case "about": { // aboutページ → index.htmlに遷移の場合
+        // workを元に戻す、
+        // aboutの画像、テキストなどを元に戻すアニメーション
+        await hideAboutPage();
+
+        await loadPage("/");
+        await pushHistory("/");
+        break;
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    isAnimating = false;
   }
 }
