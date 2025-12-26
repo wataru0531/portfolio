@@ -56,12 +56,8 @@ export class Content {
     // this.$.el.inner = this.$.el.querySelector(".content__inner");
     // ⭐️遷移先から要素を突っ込む用のラッパーのDOM
     this.$.contentGroupInner = this.$.el.querySelector(".content__group-inner");
-    this.$.contentThumbsInner = this.$.el.querySelector(
-      ".content__thumbs-inner"
-    );
-    this.$.contentImageWrapper = this.$.el.querySelector(
-      ".content__image-wrapper"
-    );
+    this.$.contentThumbsInner = this.$.el.querySelector(".content__thumbs-inner");
+    this.$.contentImageWrapper = this.$.el.querySelector(".content__image-wrapper");
 
     this.$.title = this.$.el.querySelector(".content__title");
     this.$.titleInner = [...this.$.title.querySelectorAll(".oh__inner")];

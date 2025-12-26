@@ -1,6 +1,6 @@
 // TODO
 
-// ⭐️ aboutページを開いてから戻す処理 → 戻るボタンの実装から ... backAboutToIndexBtn
+// ⭐️ aboutページのインスタンス作成、アニメーションを付与
 
 import Lenis from "lenis";
 import gsap from "gsap";
@@ -48,7 +48,7 @@ let worksInViewport = null; // 画面に入っているWorkインスタンス。
 const aboutInner = document.getElementById("js-about-inner");
 let aboutInstance; // new Aboutのインスタンス
 
-aboutInstance = new About(aboutInner); // ⭐️ About 初期化
+// aboutInstance = new About(aboutInner); // ⭐️ About 初期化
 
 
 // ✅ Lenis初期化
@@ -480,7 +480,7 @@ async function showContent(_work, isAnimate = true) {
     opacity: 0,
   });
 
-  // ⭐️ TODO
+  // ⭐️ TODO コードの意図
   const scaleY =
     _work.$.imageInner.getBoundingClientRect().height /
     _work.$.imageInner.offsetHeight;
@@ -691,6 +691,8 @@ async function showAboutPage(_about, isAnimate = true) {
   // console.log(worksInViewport); // (3) [{idx: 0, work: Work}, {…}, {…}]
 
   // ⭐️ ここからworkを外に出すアニメーションから → 新しい関数をつくる
+
+  aboutInstance = new About(aboutInner); // ⭐️ About 初期化
 
   // gsap.set([contentInstance.$.titleInner, contentInstance.$.metaInner], {
   //   yPercent: -101,
