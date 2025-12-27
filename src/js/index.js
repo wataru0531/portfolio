@@ -1,6 +1,10 @@
 // TODO
 
-// ⭐️ aboutページのインスタンス作成、アニメーションを付与
+// aboutページ、workページがスクロールできるように設定
+// → lenis.stopをするとスクロールできなくなる。
+
+// ⭐️ aboutページのアニメーションを付与
+// 
 
 import Lenis from "lenis";
 import gsap from "gsap";
@@ -450,7 +454,7 @@ function getVisibleWorks(){
 async function showContent(_work, isAnimate = true) {
   // index.html以外はアニメーションさせない
   // console.log(_work); // Work {$: {…}}
-  lenis.stop();
+  // lenis.stop();
 
   // ページに応じたアニメーション設定
   const config = isAnimate ? ANIMATION_CONFIG : { duration: 0, ease: "none" };
